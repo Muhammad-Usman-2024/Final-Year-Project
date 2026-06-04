@@ -1,2 +1,2 @@
-# Final-Year-Project
-Blood Donation Platform
+# Final-Year--Project
+Blood Donation &amp; Thalassemia Smart Platform

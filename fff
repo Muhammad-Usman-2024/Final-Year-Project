@@ -1,0 +1,62 @@
+PORT=5000
+MONGO_URI=mongodb://localhost:27017/blood-donation
+FRONTEND_URL=http://localhost:5173
+JWT_ACCESS_SECRET=Usm@n427257
+JWT_ACCESS_EXPIRY=7d
+JWT_REFRESH_SECRET=Usm@n427257
+JWT_REFRESH_EXPIRY=7d
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=465
+SMTP_USER=muhammadusmanintel@gmail.com
+SMTP_PASS=Usm@n427257
+SMTP_FROM=BloodSmart
+NODE_ENV=development
+ADMIN_EMAIL=admin@bloodsmart.com
+ADMIN_PASSWORD=admin123
+OPENAI_API_KEY=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
+
+
+
+
+VITE_API_URL=http://localhost:5000/api
+
+
+
+
+
+1. 📊 Admin (System Control Owner)
+Admin poore platform ka supervisor hota hai jo backend aur frontend ke resources ko handle karta hai.
+
+User Approval & Control: Naye register hone wale Users (Doctors, Hospitals/Blood Banks) ki verification aur approval Admin ke haath mein hoti hai.
+Blood Stock Tracking: Ye check karta hai ke pure platform par kis hospital ya blood bank ke paas kitna stock hai.
+AI-Driven Forecasting (Module 14): Admin ke dashboard par AI demand forecasting graph hota hai. Ye system admin ko 1 hafta pehle hi bata deta hai ke kaunse blood group ki kami hone wali hai, taake admin timely blood camps arrange kar sake.
+2. 👨‍⚕️ Doctor (Medical Expert)
+Doctor thalassemia patients ki health ko maintain aur monitor karne ke liye clinical panel chalata hai.
+
+Patient Assignment: Doctor ko patients assign kiye jaate hain jin ki health ka wo zimmadar hota hai.
+Treatment & Prescriptions (Module 7): Patient ka Chelation therapy record aur transfusion schedule update karna.
+AI Risk Assessment (Module 13): Doctor ke dashboard par AI Risk Badge (Red, Yellow, Green) show hota hai. Agar AI model predict kare ke kisi thalassemia patient ko aglay 2 hafte mein transfusion crisis hone wala hai, to doctor ko foran alert milta hai taake wo emergency se pehle ilaaj shuru kar sake.
+3. 👤 Patient (Thalassemia & Blood Recipient)
+Patient wo user hai jise blood transfusion ki zaroorat hoti hai ya jo ilaaj karwa raha hai.
+
+Clinical Records: Apni hemoglobin (Hb) history aur pichli blood transfusions ka data dekhna.
+Smart Blood Search (Module 5 & 15): Jab patient blood search karega, to rule-based engine sirf unhi blood bags ko display karega jo patient ke antibodies aur Rh factor ke sath 100% compatible hon taake transfusion react na kare.
+Spiritual & Emotional Support (Module 8): Patient apne wellness panel par rojana ki Quranic verses, duaein aur meditation tools dekh sakta hai aur apna mental stress/mood record kar sakta hai.
+4. 🩸 Donor (Blood Donating Member)
+Donor wo insaan hai jo blood donate karke kisi ki jaan bachana chahta hai.
+
+Eligibility Check (Module 3): Profile banate hi system donor ki age, weight, aur last donation date check karke batata hai ke wo donate karne ke kabil hai ya nahi.
+Donation Appointment (Module 11): Kisi bhi safe blood bank ya hospital mein apni marzi ka time choose karke appointment book karta hai.
+Urgent Request Broadcast (Module 10): Jab bhi kisi patient ko emergency blood ki zarurat hoti hai, to compatible donor ko SMS/Notification mil jata hai taake wo foran donate kar sake.
+5. 🏥 Hospital / Blood Bank (Inventory Manager)
+Ye centers blood units ko store aur distribute karte hain.
+
+Stock Management (Module 4): Khoon ke bags ko blood group aur expiry date ke sath inventory mein save karna.
+Request Fulfillment: Jab koi patient ya doctor system ke zariye blood request bhejta hai, to hospital us request ko check karke bag issue karta hai.
+Donation Verification: Jab donor physical center par appointment ke liye aata hai, to hospital staff donation confirm karke inventory count ko auto-increment (barha) deta hai.
+🔄 Ek Aam Scenario (Workflow Example)
+Donor appointment book karta hai → Hospital blood collect karke inventory barhata hai.
+Patient ko blood chahiye → System (AI) compatible matching check karta hai → Match hone par transfusion hoti hai.
+Doctor data update karta hai → AI Model check karke report deta hai ke patient safe hai ya risk par.
+Admin forecasting graph dekh kar future ke camps organize kar leta hai.
+

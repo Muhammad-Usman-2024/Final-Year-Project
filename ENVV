@@ -1,0 +1,86 @@
+PORT=5000
+NODE_ENV=development
+
+# ─── URL Configuration ────────────────────────────────────────────────────────
+BASE_URL=http://localhost:5000/api
+BASE_URL_FRONTEND=http://localhost:5173,http://localhost:3000
+
+# ─── Database & Cache ────────────────────────────────────────────────────────
+MONGO_URI=mongodb://127.0.0.1:27017/mtlbooking
+MONGO_ATLAS_URI=mongodb://127.0.0.1:27017/auditslogs
+REDIS_URL=redis://127.0.0.1:6379
+
+# ─── Authentication ───────────────────────────────────────────────────────────
+JWT_SECRET=Usm@n4272579
+JWT_REFRESH_SECRET=Usm@n4272579
+
+# ─── Super Admin Configuration ───────────────────────────────────────────────
+SUPERADMINEMAIL=superadmin@mtl.com
+SUPERADMINPSW=Usm@n123
+SUPERADMIN_COMPANY_NAME=Mega Transfers Limited
+SUPERADMIN_COMPANY_ADDRESS=1st Floor, 29-31 Minerva Road, London, NW10 6HJ
+SUPERADMIN_COMPANY_PHONE=+44 208 9611818
+SUPERADMIN_COMPANY_EMAIL=megatransfers22@gmail.com
+SUPERADMIN_COMPANY_WEBSITE=https://www.mtl.com
+
+# ─── Email Services ──────────────────────────────────────────────────────────
+# SiteGround SMTP
+SMTP_HOST=mtldispatch.com
+SMTP_PORT=465
+SMTP_SECURE=true
+SMTP_USER=info@mtldispatch.com
+SMTP_PASS=MTLUsm@nAm@n
+MAIL_FROM_NAME=MTL Dispatch
+MAIL_FROM_EMAIL=info@mtldispatch.com
+
+# SiteGround (Old)
+SITEGROUND_USER_EMAIL=info@mtldispatch.com
+SITEGROUND_EMAIL_PASSWORD=MTLUsm@nAm@n
+
+# Gmail
+GMAIL_USER=mtlcontrol10@gmail.com
+GMAIL_PASS=sryx vnbb bdcd vrei
+
+# Resend / Brevo / SendGrid
+RESEND_API_KEY=re_eR7A93qU_MteFyujSuwb77hJ7MnHqVDnb
+BREVO_API_KEY=nXSkh6OTNvICqV3d
+BREVO_SENDER_EMAIL=98bbea001@smtp-brevo.com
+SENDGRID_API_KEY=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
+FROM_EMAIL=mtlcontrol10@gmail.com
+
+# ─── Third-Party APIs ───────────────────────────────────────────────────────
+# OpenAI
+OPENAI_API_KEY=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
+
+# Stripe
+STRIPE_SECRET_KEY=sk_test_51RyohODLE41U3GQ4U76jZjeJs1ra9vZlu4wWVrbjUOp65MxK8OBNRoUpjKNkivHGQpGMpW4LYiohu58HuHDtcOR100FFZtb4IJ
+STRIPE_WEBHOOK_SECRET=whsec_BqTcm34d9bV6bYTFLcEvM9vW5azOeo2H
+
+# Stripe Fee Account (For Platform Fee)
+STRIPE_FEE_SECRET_KEY=sk_test_your_fee_key_here
+STRIPE_FEE_WEBHOOK_SECRET=whsec_your_fee_webhook_secret_here
+
+# Personal Stripe Account 
+PERSONAL_STRIPE_SECRET_KEY=sk_test_51SNuPoAruJJmbudyl6IwKGECSFwwoZcre1oOqkG5OoCNSMcCwtsWKPzBXHv9yOxjhtOobeBhCoEvddusjVr3Gitm008Q0iV7Po
+PERSONAL_STRIPE_PUBLISHABLE_KEY=pk_test_51SNuPoAruJJmbudyuFDQRBPDHC5ZLF4VQaKX8u3iIq8gfFxRDXf6hcDzRQVc2aY4BrCG27NXYkXLCzm5RsNLtY1I00UEfQcBVI
+PERSONAL_STRIPE_WEBHOOK_SECRET=
+
+# Cloudinary
+CLOUDINARY_CLOUD_NAME=dyiadnfvr
+CLOUDINARY_API_KEY=465663249353568
+CLOUDINARY_API_SECRET=0jWRfpso0G9y39UaYM1k4K8HCtc
+
+# FlightAware
+FLIGHTAWARE_BASE_URL=https://aeroapi.flightaware.com/aeroapi/flights
+FLIGHTAWARE_API_KEY=DqYvKGg7hYraQk32v33KTiW7kKVRFlWh
+
+# Google
+GOOGLE_API_KEY=AIzaSyAQ4siuqzd_H19BQfpUPAxYndkqFAn-Irc
+GOOGLE_CLIENT_ID=666247097260-3m7le0mur9k22vq13e3gmtua0ufec3ur.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=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
+GOOGLE_REDIRECT_URI=http://localhost:5000/api/google/auth/google/callback
+
+# ─── Push Notifications ──────────────────────────────────────────────────────
+# OneSignal
+ONESIGNAL_APP_ID=YOUR_ONESIGNAL_APP_ID
+ONESIGNAL_REST_API_KEY=YOUR_ONESIGNAL_REST_API_KEY

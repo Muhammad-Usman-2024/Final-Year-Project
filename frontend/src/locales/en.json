@@ -1,0 +1,124 @@
+{
+  "navbar": {
+    "features": "Features",
+    "howItWorks": "How it Works",
+    "login": "Login / Register"
+  },
+  "hero": {
+    "badge": "Pakistan's #1 Smart Blood Network",
+    "title1": "Donate Blood.",
+    "title2": "Save Lives Digitally.",
+    "subtitle": "The ultimate platform bridging the gap between blood donors, hospitals, and Thalassemia patients with lightning-fast real-time matching.",
+    "cta1": "Enter Platform",
+    "cta2": "Discover More"
+  },
+  "mission": {
+    "badge": "Our Mission",
+    "title": "No one should die waiting for blood.",
+    "p1": "Every second counts during a medical emergency. Our mission is to eliminate the severe communication delays between blood banks, voluntary donors, and critical patients across the nation.",
+    "quote": "We leverage smart algorithms and real-time alerts to ensure that life-saving blood reaches the right person at the right time.",
+    "urgentTitle": "Urgent Needs",
+    "urgentDesc": "Instantly broadcast requirements to nearby eligible donors.",
+    "verifiedTitle": "Verified Data",
+    "verifiedDesc": "100% verified hospitals and PMDC registered doctors."
+  },
+  "process": {
+    "badge": "The Process",
+    "title": "How BloodSync Works",
+    "step1": { "title": "Register Account", "desc": "Sign up securely as a Donor, Patient, Doctor, or Hospital." },
+    "step2": { "title": "Get Verified", "desc": "Complete your profile. Professionals verify their licenses." },
+    "step3": { "title": "Smart Match", "desc": "Our algorithm instantly connects requests with compatible donors." },
+    "step4": { "title": "Save Lives", "desc": "Coordinate donations seamlessly and track your impact." }
+  },
+  "features": {
+    "title": "Powerful Features",
+    "subtitle": "A robust suite of tools designed to make blood donation seamless, secure, and highly efficient.",
+    "match": { "title": "Real-Time Matching", "desc": "Advanced algorithms automatically match blood requests with the nearest eligible donors." },
+    "alerts": { "title": "Instant Alerts", "desc": "Push notifications ensure that urgent requirements are seen immediately by the community." },
+    "inventory": { "title": "Inventory Tracking", "desc": "Hospitals can digitally manage their blood bank stock, tracking expiries and shortages." },
+    "security": { "title": "Secure Architecture", "desc": "Built with enterprise-grade JWT strategy and role-based access control for maximum privacy." },
+    "wellness": { "title": "Wellness Tracking", "desc": "Donors can track their donation history and post-donation health recovery metrics." },
+    "scheduling": { "title": "Smart Scheduling", "desc": "Book donation appointments directly with hospitals to avoid long waiting queues." }
+  },
+  "roles": {
+    "badge": "Ecosystem",
+    "title": "Dedicated Dashboards",
+    "subtitle": "We provide tailored experiences with specialized tools for every participant in the healthcare cycle.",
+    "cta": "Explore Roles",
+    "donor": { "title": "Donors", "text": "Track donations, view wellness, and receive urgent requests." },
+    "patient": { "title": "Patients", "text": "Request blood instantly and track matches in real-time." },
+    "hospital": { "title": "Hospitals", "text": "Manage blood bank inventory and verify donor health." },
+    "doctor": { "title": "Doctors", "text": "Oversee patient treatments and validate thalassemia records." }
+  },
+  "stats": {
+    "donors": "Registered Donors",
+    "hospitals": "Hospitals Linked",
+    "lives": "Lives Saved",
+    "response": "Response Time"
+  },
+  "thalassemia": {
+    "badge": "Specialized Care",
+    "title": "Dedicated Thalassemia Support",
+    "p1": "Thalassemia major patients require regular, lifelong blood transfusions. Sourcing fresh blood every month is a monumental challenge for families.",
+    "list": [
+      "Recurring donation scheduling",
+      "Dedicated donor pools for specific patients",
+      "Automated reminders before transfusion dates",
+      "Doctor-supervised digital medical records"
+    ],
+    "alert": "Urgent Alert",
+    "now": "Just now",
+    "required": "O- Negative Required",
+    "at": "Thalassemia Patient at City Hospital",
+    "accept": "Accept Request"
+  },
+  "security": {
+    "title": "Bank-Grade Security & Trust",
+    "p1": "Medical data is highly sensitive. We employ state-of-the-art security measures to ensure that your identity and medical records remain 100% private.",
+    "jwt": { "title": "JWT Authentication", "desc": "Stateless, encrypted token strategy ensuring secure sessions." },
+    "pmdc": { "title": "PMDC Verification", "desc": "All doctors must provide valid PMDC licenses for approval." },
+    "rbac": { "title": "Role Isolation", "desc": "Strict RBAC prevents unauthorized access to medical records." }
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "q1": { "q": "Who can donate blood?", "a": "Any healthy individual aged 18-65, weighing at least 50kg, and meeting standard medical criteria can donate." },
+    "q2": { "q": "Is my personal data secure?", "a": "Yes, we use advanced JWT encryption and never share your contact details publicly. Communication happens via secure in-app alerts." },
+    "q3": { "q": "How do hospitals use this platform?", "a": "Hospitals get a dedicated inventory dashboard to manage their blood bank, broadcast shortages, and verify patient records." },
+    "q4": { "q": "Is it free to use?", "a": "Absolutely. BloodSync is a 100% free platform dedicated to serving humanity." }
+  },
+  "footer": {
+    "tagline": "Developed as a Final Year Project. Empowering communities through technology.",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "contact": "Contact Support",
+    "rights": "© 2026 BloodSync Smart Platform. All rights reserved. Developed by Muhammad Usman"
+  },
+  "dashboard": {
+    "dashboard": "Dashboard",
+    "profile": "Profile",
+    "info": "Info",
+    "edit": "Edit",
+    "admin": "Admin",
+    "donations": "Donations",
+    "schedule": "Schedule",
+    "eligibility": "Eligibility",
+    "history": "History",
+    "process": "Process",
+    "search": "Search",
+    "alerts": "Alerts",
+    "center": "Center",
+    "preferences": "Preferences",
+    "wellness": "Wellness",
+    "feed": "Feed",
+    "community": "Community",
+    "overview": "Overview",
+    "management": "Management",
+    "broadcasts": "Broadcasts",
+    "forecasting": "Forecasting",
+    "auditLogs": "Audit Logs",
+    "logout": "Logout",
+    "welcome": "Welcome back",
+    "session": "Session",
+    "active": "Active"
+  }
+}
