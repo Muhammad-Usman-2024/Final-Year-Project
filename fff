@@ -1,6 +1,7 @@
 PORT=5000
 MONGO_URI=mongodb://localhost:27017/blood-donation
 FRONTEND_URL=http://localhost:5173
+https://blood-sync.netlify.app/
 JWT_ACCESS_SECRET=Usm@n427257
 JWT_ACCESS_EXPIRY=7d
 JWT_REFRESH_SECRET=Usm@n427257
@@ -18,9 +19,9 @@ OPENAI_API_KEY=sk-proj-zmMMu-SEjo0wE6Pn3_TwbyyGwYvLGyZQ2yZDXwUBXuU76oeUAf7RiDFjf
 
 
 
-VITE_API_URL=http://localhost:5000/api
+VITE_API_URL=https://final-year-project-f2p0.onrender.com/api
 
-
+VITE_API_URL=https://final-year-project-f2p0.onrender.com/api
 
 
 
