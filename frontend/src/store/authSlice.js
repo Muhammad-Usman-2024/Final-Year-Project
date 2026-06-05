@@ -33,6 +33,7 @@ export const logout = createAsyncThunk('auth/logout', async (_, thunkAPI) => {
     await authService.logout();
     localStorage.removeItem('user');
   } catch (error) {
+    localStorage.removeItem('user');
     const message = error.response?.data?.message || error.message || error.toString();
     return thunkAPI.rejectWithValue(message);
   }
@@ -53,6 +54,13 @@ export const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
+    clearAuth: (state) => {
+      state.user = null;
+      state.isLoading = false;
+      state.isSuccess = false;
+      state.isError = false;
+      state.message = '';
+    },
     reset: (state) => {
       state.isLoading = false;
       state.isSuccess = false;
@@ -91,9 +99,12 @@ export const authSlice = createSlice({
       })
       .addCase(logout.fulfilled, (state) => {
         state.user = null;
+      })
+      .addCase(logout.rejected, (state) => {
+        state.user = null;
       });
   },
 });
 
-export const { reset } = authSlice.actions;
+export const { clearAuth, reset } = authSlice.actions;
 export default authSlice.reducer;

@@ -11,6 +11,7 @@ import {
   Package, 
   Stethoscope, 
   BarChart3, 
+  ShieldAlert,
   LogOut,
   Menu,
   X
@@ -24,47 +25,74 @@ const Sidebar = ({ activeTab, setActiveTab, activeSubTab, setActiveSubTab, user,
 
   let menuItems = [];
 
-  if (user?.role === 'Admin') {
+  if (user?.role === 'SuperAdmin') {
     menuItems = [
       { 
-        id: 'dashboard', 
+        id: 'profile-info',
+        tabId: 'dashboard',
+        subTabId: 'personal',
         label: t('dashboard.profile'), 
         icon: UserCheck,
-        subItems: [
-          { id: 'personal', label: t('dashboard.info') },
-          { id: 'admin', label: t('dashboard.admin') },
-          { id: 'edit', label: t('dashboard.edit') },
-        ]
+      },
+      {
+        id: 'profile-edit',
+        tabId: 'dashboard',
+        subTabId: 'edit',
+        label: t('dashboard.edit'),
+        icon: UserCheck,
       },
       { 
-        id: 'admin', 
-        label: t('dashboard.admin'), 
+        id: 'admin-overview',
+        tabId: 'admin',
+        subTabId: 'overview',
+        label: t('dashboard.overview'),
         icon: LayoutDashboard,
-        subItems: [
-          { id: 'overview', label: t('dashboard.overview') },
-          { id: 'users', label: t('dashboard.management') },
-          { id: 'broadcast', label: t('dashboard.broadcasts') },
-          { id: 'forecast', label: t('dashboard.forecasting') },
-          { id: 'audit', label: t('dashboard.auditLogs') },
-        ]
       },
-      { id: 'notifications', label: t('dashboard.alerts'), icon: Bell },
+      {
+        id: 'admin-users',
+        tabId: 'admin',
+        subTabId: 'users',
+        label: t('dashboard.management'),
+        icon: UserCheck,
+      },
+      {
+        id: 'admin-broadcast',
+        tabId: 'admin',
+        subTabId: 'broadcast',
+        label: t('dashboard.broadcasts'),
+        icon: Bell,
+      },
+      {
+        id: 'admin-forecast',
+        tabId: 'admin',
+        subTabId: 'forecast',
+        label: t('dashboard.forecasting'),
+        icon: BarChart3,
+      },
+      {
+        id: 'admin-audit',
+        tabId: 'admin',
+        subTabId: 'audit',
+        label: t('dashboard.auditLogs'),
+        icon: ShieldAlert,
+      },
+      { id: 'notifications', subTabId: 'center', label: t('dashboard.alerts'), icon: Bell },
     ];
-  } else {
+  } else if (user?.role === 'Donor') {
     menuItems = [
-      { 
-        id: 'dashboard', 
-        label: t('dashboard.profile'), 
+      {
+        id: 'dashboard',
+        label: t('dashboard.profile'),
         icon: UserCheck,
         subItems: [
           { id: 'personal', label: t('dashboard.info') },
-          { id: user?.role?.toLowerCase() || 'donor', label: user?.role || 'Role' },
+          { id: 'donor', label: 'Donor Profile' },
           { id: 'edit', label: t('dashboard.edit') },
         ]
       },
-      { 
-        id: 'donations', 
-        label: t('dashboard.donations'), 
+      {
+        id: 'donations',
+        label: t('dashboard.donations'),
         icon: Heart,
         subItems: [
           { id: 'register', label: t('dashboard.schedule') },
@@ -74,32 +102,161 @@ const Sidebar = ({ activeTab, setActiveTab, activeSubTab, setActiveSubTab, user,
         ]
       },
       { id: 'search', label: t('dashboard.search'), icon: Search },
-      { 
-        id: 'notifications', 
-        label: t('dashboard.alerts'), 
-        icon: Bell,
-        subItems: [
-          { id: 'center', label: t('dashboard.center') },
-          { id: 'preferences', label: t('dashboard.preferences') },
-        ]
-      },
-      { 
-        id: 'wellness', 
-        label: t('dashboard.wellness'), 
+      {
+        id: 'wellness',
+        label: t('dashboard.wellness'),
         icon: Sparkles,
         subItems: [
           { id: 'feed', label: t('dashboard.feed') },
           { id: 'community', label: t('dashboard.community') },
         ]
       },
-      { 
-        id: 'scheduling', 
-        label: t('dashboard.schedule'), 
+      {
+        id: 'notifications',
+        label: t('dashboard.alerts'),
+        icon: Bell,
+        subItems: [
+          { id: 'center', label: t('dashboard.center') },
+          { id: 'preferences', label: t('dashboard.preferences') },
+        ]
+      },
+    ];
+
+  } else if (user?.role === 'Patient') {
+    menuItems = [
+      {
+        id: 'dashboard',
+        label: t('dashboard.profile'),
+        icon: UserCheck,
+        subItems: [
+          { id: 'personal', label: t('dashboard.info') },
+          { id: 'patient', label: 'Thalassemia Profile' },
+          { id: 'edit', label: t('dashboard.edit') },
+        ]
+      },
+      { id: 'search', label: t('dashboard.search'), icon: Search },
+      {
+        id: 'scheduling',
+        label: t('dashboard.schedule'),
         icon: Calendar,
         subItems: [
-          { id: 'book', label: t('dashboard.schedule') },
+          { id: 'book', label: 'Book Appointment' },
+          { id: 'my', label: 'My Appointments' },
+        ]
+      },
+      {
+        id: 'wellness',
+        label: t('dashboard.wellness'),
+        icon: Sparkles,
+        subItems: [
+          { id: 'feed', label: t('dashboard.feed') },
+          { id: 'community', label: t('dashboard.community') },
+        ]
+      },
+      {
+        id: 'notifications',
+        label: t('dashboard.alerts'),
+        icon: Bell,
+        subItems: [
+          { id: 'center', label: t('dashboard.center') },
+          { id: 'preferences', label: t('dashboard.preferences') },
+        ]
+      },
+    ];
+
+  } else if (user?.role === 'Hospital') {
+    menuItems = [
+      {
+        id: 'dashboard',
+        label: t('dashboard.profile'),
+        icon: UserCheck,
+        subItems: [
+          { id: 'personal', label: t('dashboard.info') },
+          { id: 'edit', label: t('dashboard.edit') },
+        ]
+      },
+      {
+        id: 'inventory',
+        label: 'Blood Inventory',
+        icon: Package,
+      },
+      { id: 'search', label: t('dashboard.search'), icon: Search },
+      {
+        id: 'scheduling',
+        label: t('dashboard.schedule'),
+        icon: Calendar,
+        subItems: [
+          { id: 'manage', label: t('dashboard.management') },
           { id: 'my', label: t('dashboard.history') },
-          ...(user.role === 'Hospital' || user.role === 'Doctor' ? [{ id: 'manage', label: t('dashboard.management') }] : []),
+        ]
+      },
+      { id: 'analytics', label: 'Analytics', icon: BarChart3 },
+      {
+        id: 'notifications',
+        label: t('dashboard.alerts'),
+        icon: Bell,
+        subItems: [
+          { id: 'center', label: t('dashboard.center') },
+          { id: 'preferences', label: t('dashboard.preferences') },
+        ]
+      },
+    ];
+
+  } else if (user?.role === 'Doctor') {
+    menuItems = [
+      {
+        id: 'dashboard',
+        label: t('dashboard.profile'),
+        icon: UserCheck,
+        subItems: [
+          { id: 'personal', label: t('dashboard.info') },
+          { id: 'edit', label: t('dashboard.edit') },
+        ]
+      },
+      {
+        id: 'doctor',
+        label: 'Medical Panel',
+        icon: Stethoscope,
+      },
+      {
+        id: 'scheduling',
+        label: t('dashboard.schedule'),
+        icon: Calendar,
+        subItems: [
+          { id: 'manage', label: 'Manage Slots' },
+          { id: 'my', label: t('dashboard.history') },
+        ]
+      },
+      { id: 'analytics', label: 'Analytics', icon: BarChart3 },
+      {
+        id: 'notifications',
+        label: t('dashboard.alerts'),
+        icon: Bell,
+        subItems: [
+          { id: 'center', label: t('dashboard.center') },
+          { id: 'preferences', label: t('dashboard.preferences') },
+        ]
+      },
+    ];
+
+  } else {
+    // Fallback for any unrecognized role
+    menuItems = [
+      {
+        id: 'dashboard',
+        label: t('dashboard.profile'),
+        icon: UserCheck,
+        subItems: [
+          { id: 'personal', label: t('dashboard.info') },
+          { id: 'edit', label: t('dashboard.edit') },
+        ]
+      },
+      {
+        id: 'notifications',
+        label: t('dashboard.alerts'),
+        icon: Bell,
+        subItems: [
+          { id: 'center', label: t('dashboard.center') },
         ]
       },
     ];
@@ -131,15 +288,17 @@ const Sidebar = ({ activeTab, setActiveTab, activeSubTab, setActiveSubTab, user,
           <nav className="flex-1 space-y-2 overflow-y-auto scrollbar-hide">
             {menuItems.map((item) => {
               const Icon = item.icon;
-              const isActive = activeTab === item.id;
+              const targetTab = item.tabId || item.id;
+              const targetSubTab = item.subTabId || item.subItems?.[0]?.id;
+              const isActive = activeTab === targetTab && (!item.subTabId || activeSubTab === item.subTabId);
               
               return (
                 <div key={item.id} className="space-y-1">
                   <button
                     onClick={() => {
-                      setActiveTab(item.id);
-                      if (item.subItems) {
-                        setActiveSubTab(item.subItems[0].id);
+                      setActiveTab(targetTab);
+                      if (targetSubTab) {
+                        setActiveSubTab(targetSubTab);
                       }
                       if (!item.subItems) setIsOpen(false);
                     }}

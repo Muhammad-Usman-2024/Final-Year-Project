@@ -2,7 +2,32 @@ import mongoose from 'mongoose';
 import Appointment from '../models/Appointment.js';
 import DonationRecord from '../models/DonationRecord.js';
 import DonorProfile from '../models/DonorProfile.js';
+import User from '../models/User.js';
 import { ApiResponse, ApiError } from '../utils/ApiResponse.js';
+import { notifySuperAdmin, notifyUser } from '../utils/notificationEvents.js';
+
+// @desc    Get donation dashboard stats
+// @route   GET /api/donation/stats
+export const getDonationStats = async (req, res) => {
+    const today = new Date().toISOString().split('T')[0];
+    const monthStart = new Date();
+    monthStart.setDate(1);
+    monthStart.setHours(0, 0, 0, 0);
+
+    const [registeredDonors, thisMonth, scheduledToday, pendingApproval] = await Promise.all([
+        User.countDocuments({ role: 'Donor', isActive: { $ne: false } }),
+        DonationRecord.countDocuments({ createdAt: { $gte: monthStart } }),
+        Appointment.countDocuments({ type: 'Donation', date: today, status: 'Scheduled' }),
+        Appointment.countDocuments({ type: 'Donation', status: 'Scheduled' })
+    ]);
+
+    return res.status(200).json(new ApiResponse(200, {
+        registeredDonors,
+        thisMonth,
+        scheduledToday,
+        pendingApproval
+    }, 'Donation stats fetched successfully'));
+};
 
 // @desc    Get available slots for a hospital and date
 // @route   GET /api/donation/available-slots
@@ -67,6 +92,24 @@ export const bookAppointment = async (req, res) => {
         notes: specialNotes // Map specialNotes to notes in Appointment schema
     });
 
+    await notifyUser(req.user._id, {
+        type: 'appointment_update',
+        priority: 'medium',
+        title: 'Donation appointment booked',
+        message: `Your donation appointment at ${hospitalName} is scheduled for ${date} at ${slot}.`,
+        link: '/dashboard/donations',
+        metadata: { appointmentId: appointment._id, date, slot, hospitalName }
+    });
+
+    await notifySuperAdmin({
+        type: 'appointment_update',
+        priority: 'low',
+        title: 'New donation appointment',
+        message: `${req.user.fullName} booked a donation appointment at ${hospitalName}.`,
+        link: '/admin/overview',
+        metadata: { appointmentId: appointment._id, donorId: req.user._id }
+    });
+
     return res.status(201).json(new ApiResponse(201, appointment, 'Appointment booked successfully'));
 };
 
@@ -111,6 +154,26 @@ export const updateDonationStatus = async (req, res) => {
             await profile.save();
         }
     }
+
+    await notifyUser(appointment.userId, {
+        type: status === 'Completed' ? 'donation_reminder' : 'appointment_update',
+        priority: status === 'Completed' ? 'high' : 'medium',
+        title: status === 'Completed' ? 'Donation completed' : 'Donation status updated',
+        message: status === 'Completed'
+            ? `Thank you. Your donation at ${appointment.hospitalName} has been marked completed.`
+            : `Your donation at ${appointment.hospitalName} was marked ${status}.`,
+        link: '/dashboard/donations',
+        metadata: { appointmentId: appointment._id, recordId: record._id, status }
+    });
+
+    await notifySuperAdmin({
+        type: 'donation_reminder',
+        priority: 'medium',
+        title: `Donation ${status}`,
+        message: `Donation record at ${appointment.hospitalName} was marked ${status}.`,
+        link: '/admin/overview',
+        metadata: { appointmentId: appointment._id, recordId: record._id, status }
+    });
 
     return res.status(200).json(new ApiResponse(200, record, `Donation marked as ${status}`));
 };

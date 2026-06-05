@@ -9,7 +9,7 @@ import {
 import { protect, authorize } from '../middleware/authMiddleware.js';
 
 router.use(protect);
-router.use(authorize('Admin', 'Hospital', 'Doctor'));
+router.use(authorize('SuperAdmin', 'Hospital', 'Doctor'));
 
 router.get('/donations', getDonationAnalytics);
 router.get('/patients', getPatientHealthStats);

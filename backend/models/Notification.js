@@ -15,6 +15,11 @@ const notificationSchema = new mongoose.Schema({
             'donation_reminder',
             'broadcast_alert',
             'appointment_update',
+            'slot_available',
+            'medical_update',
+            'profile_update',
+            'inventory_update',
+            'user_management',
             'request_fulfilled',
             'system'
         ],
@@ -45,6 +50,11 @@ const notificationSchema = new mongoose.Schema({
     isRead: {
         type: Boolean,
         default: false
+    },
+    status: {
+        type: String,
+        enum: ['Pending', 'Accepted', 'Declined'],
+        default: 'Pending'
     }
 }, { timestamps: true });
 

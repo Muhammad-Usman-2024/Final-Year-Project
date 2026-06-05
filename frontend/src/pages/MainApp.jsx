@@ -40,11 +40,54 @@ function MainApp() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const roleNavigation = {
+    SuperAdmin: {
+      defaultTab: 'admin',
+      defaultSubTab: 'overview',
+      tabs: ['dashboard', 'admin', 'notifications']
+    },
+    Donor: {
+      defaultTab: 'dashboard',
+      defaultSubTab: 'personal',
+      tabs: ['dashboard', 'donations', 'search', 'wellness', 'notifications']
+    },
+    Patient: {
+      defaultTab: 'dashboard',
+      defaultSubTab: 'personal',
+      tabs: ['dashboard', 'search', 'scheduling', 'wellness', 'notifications']
+    },
+    Hospital: {
+      defaultTab: 'dashboard',
+      defaultSubTab: 'personal',
+      tabs: ['dashboard', 'inventory', 'search', 'scheduling', 'analytics', 'notifications']
+    },
+    Doctor: {
+      defaultTab: 'dashboard',
+      defaultSubTab: 'personal',
+      tabs: ['dashboard', 'doctor', 'scheduling', 'analytics', 'notifications']
+    }
+  };
+
   useEffect(() => {
     if (!user) {
       navigate('/login');
     }
   }, [user, navigate]);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const navigation = roleNavigation[user.role] || {
+      defaultTab: 'dashboard',
+      defaultSubTab: 'personal',
+      tabs: ['dashboard', 'notifications']
+    };
+
+    if (!navigation.tabs.includes(activeTab)) {
+      setActiveTab(navigation.defaultTab);
+      setActiveSubTab(navigation.defaultSubTab);
+    }
+  }, [user, activeTab]);
 
   const onLogout = () => {
     dispatch(logout());
@@ -65,6 +108,7 @@ function MainApp() {
         isOpen={isSidebarOpen}
         setIsOpen={setIsSidebarOpen}
       />
+      <NotificationDrawer />
 
       <main className={`flex-1 ${currentLanguage.startsWith('ur') ? 'lg:mr-72' : 'lg:ml-72'} min-h-screen flex flex-col`}>
         {/* Mobile Header */}
@@ -127,15 +171,15 @@ function MainApp() {
               
               <div className="relative z-10">
                 {activeTab === 'dashboard' && <ProfileView activeSubTab={activeSubTab} setActiveSubTab={setActiveSubTab} />}
-                {activeTab === 'donations' && <DonationDashboard activeSubTab={activeSubTab} setActiveSubTab={setActiveSubTab} />}
-                {activeTab === 'inventory' && <InventoryDashboard />}
+                {activeTab === 'donations' && user.role === 'Donor' && <DonationDashboard activeSubTab={activeSubTab} setActiveSubTab={setActiveSubTab} />}
+                {activeTab === 'inventory' && user.role === 'Hospital' && <InventoryDashboard />}
                 {activeTab === 'search' && <SearchDashboard />}
                 {activeTab === 'notifications' && <NotificationsDashboard activeSubTab={activeSubTab} setActiveSubTab={setActiveSubTab} />}
-                {activeTab === 'doctor' && <DoctorDashboard />}
+                {activeTab === 'doctor' && user.role === 'Doctor' && <DoctorDashboard />}
                 {activeTab === 'wellness' && <WellnessHub activeSubTab={activeSubTab} setActiveSubTab={setActiveSubTab} />}
                 {activeTab === 'admin' && <AdminDashboard activeSubTab={activeSubTab} />}
                 {activeTab === 'scheduling' && <AppointmentHub activeSubTab={activeSubTab} setActiveSubTab={setActiveSubTab} />}
-                {activeTab === 'analytics' && <AnalyticsDashboard />}
+                {activeTab === 'analytics' && (user.role === 'Hospital' || user.role === 'Doctor') && <AnalyticsDashboard />}
               </div>
             </div>
           </div>

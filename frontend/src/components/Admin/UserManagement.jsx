@@ -31,8 +31,8 @@ const UserManagement = () => {
     const handleToggleStatus = async (id) => {
         setActionLoading(id);
         try {
-            await adminService.toggleUserStatus(id);
-            fetchUsers();
+            const res = await adminService.toggleUserStatus(id);
+            setUsers(prev => prev.map(user => user._id === id ? res.data.data : user));
         } catch (err) {
             console.error(err);
         } finally {
@@ -78,7 +78,6 @@ const UserManagement = () => {
                         <option value="Donor">Donors</option>
                         <option value="Hospital">Hospitals</option>
                         <option value="Doctor">Doctors</option>
-                        <option value="Admin">Admins</option>
                     </select>
                 </div>
             </div>
@@ -103,7 +102,9 @@ const UserManagement = () => {
                                 </td>
                             </tr>
                         ) : users.length > 0 ? (
-                            users.map((user) => (
+                            users.map((user) => {
+                              const isUserActive = user.isActive !== false;
+                              return (
                                 <tr key={user._id} className="hover:bg-white/[0.02] transition-colors group">
                                     <td className="px-8 py-6">
                                         <div className="flex items-center gap-4">
@@ -121,48 +122,49 @@ const UserManagement = () => {
                                             value={user.role} 
                                             onChange={(e) => handleRoleChange(user._id, e.target.value)}
                                             className={`bg-transparent text-xs font-bold border rounded-lg px-3 py-1.5 focus:border-accent-blue transition-all ${
-                                                user.role === 'Admin' 
+                                                user.role === 'SuperAdmin' 
                                                 ? 'text-accent-blue border-accent-blue/30 cursor-not-allowed opacity-80' 
                                                 : 'text-gray-400 border-white/10'
                                             }`}
-                                            disabled={actionLoading === user._id || user.role === 'Admin'}
+                                            disabled={actionLoading === user._id || user.role === 'SuperAdmin'}
                                         >
+                                            {user.role === 'SuperAdmin' && <option value="SuperAdmin">SuperAdmin</option>}
                                             <option value="Patient">Patient</option>
                                             <option value="Donor">Donor</option>
                                             <option value="Hospital">Hospital</option>
                                             <option value="Doctor">Doctor</option>
-                                            <option value="Admin">Admin</option>
                                         </select>
                                     </td>
                                     <td className="px-8 py-6">
                                         <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${
-                                            user.isActive 
+                                            isUserActive 
                                                 ? 'bg-accent-green/10 text-accent-green border-accent-green/20' 
                                                 : 'bg-accent-red/10 text-accent-red border-accent-red/20'
                                         }`}>
-                                            {user.isActive ? 'Active' : 'Inactive'}
+                                            {isUserActive ? 'Active' : 'Inactive'}
                                         </span>
                                     </td>
                                     <td className="px-8 py-6 text-right">
                                         <div className="flex justify-end gap-2">
                                             <button 
                                                 onClick={() => handleToggleStatus(user._id)}
-                                                disabled={actionLoading === user._id || user.role === 'Admin'}
+                                                disabled={actionLoading === user._id || user.role === 'SuperAdmin'}
                                                 className={`p-2 rounded-xl transition-all ${
-                                                    user.role === 'Admin'
+                                                    user.role === 'SuperAdmin'
                                                         ? 'bg-gray-500/10 text-gray-500 cursor-not-allowed opacity-50'
-                                                        : user.isActive 
+                                                        : isUserActive 
                                                             ? 'bg-accent-red/10 text-accent-red hover:bg-accent-red hover:text-white' 
                                                             : 'bg-accent-green/10 text-accent-green hover:bg-accent-green hover:text-white'
                                                 }`}
-                                                title={user.role === 'Admin' ? 'Admin status cannot be changed' : (user.isActive ? 'Deactivate Account' : 'Activate Account')}
+                                                title={user.role === 'SuperAdmin' ? 'SuperAdmin status cannot be changed' : (isUserActive ? 'Deactivate Account' : 'Activate Account')}
                                             >
-                                                {actionLoading === user._id ? <Loader2 className="animate-spin" size={16} /> : (user.isActive ? <UserX size={16} /> : <UserCheck size={16} />)}
+                                                {actionLoading === user._id ? <Loader2 className="animate-spin" size={16} /> : (isUserActive ? <UserX size={16} /> : <UserCheck size={16} />)}
                                             </button>
                                         </div>
                                     </td>
                                 </tr>
-                            ))
+                              );
+                            })
                         ) : (
                             <tr>
                                 <td colSpan="4" className="px-8 py-20 text-center text-gray-500">No users match your filters.</td>

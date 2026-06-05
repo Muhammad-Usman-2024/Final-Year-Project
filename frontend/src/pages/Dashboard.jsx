@@ -27,6 +27,7 @@ import { Menu } from 'lucide-react';
 
 function Dashboard() {
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [activeSubTab, setActiveSubTab] = useState('personal');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
@@ -41,11 +42,14 @@ function Dashboard() {
         <Sidebar 
           activeTab={activeTab} 
           setActiveTab={setActiveTab} 
+          activeSubTab={activeSubTab}
+          setActiveSubTab={setActiveSubTab}
           user={user} 
           onLogout={onLogout} 
           isOpen={isSidebarOpen}
           setIsOpen={setIsSidebarOpen}
         />
+        <NotificationDrawer />
 
         <main className="flex-1 lg:ml-72 min-h-screen flex flex-col">
           {/* Mobile Header */}
@@ -93,15 +97,15 @@ function Dashboard() {
                 <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-red-600/5 blur-[120px] rounded-full pointer-events-none" />
                 
                 <div className="relative z-10">
-                  {activeTab === 'dashboard' && <ProfileView />}
-                  {activeTab === 'donations' && <DonationDashboard />}
+                  {activeTab === 'dashboard' && <ProfileView activeSubTab={activeSubTab} setActiveSubTab={setActiveSubTab} />}
+                  {activeTab === 'donations' && <DonationDashboard activeSubTab={activeSubTab} setActiveSubTab={setActiveSubTab} />}
                   {activeTab === 'inventory' && <InventoryDashboard />}
                   {activeTab === 'search' && <SearchDashboard />}
-                  {activeTab === 'notifications' && <NotificationsDashboard />}
+                  {activeTab === 'notifications' && <NotificationsDashboard activeSubTab={activeSubTab} setActiveSubTab={setActiveSubTab} />}
                   {activeTab === 'doctor' && <DoctorDashboard />}
-                  {activeTab === 'wellness' && <WellnessHub />}
-                  {activeTab === 'admin' && <AdminDashboard />}
-                  {activeTab === 'scheduling' && <AppointmentHub />}
+                  {activeTab === 'wellness' && <WellnessHub activeSubTab={activeSubTab} setActiveSubTab={setActiveSubTab} />}
+                  {activeTab === 'admin' && <AdminDashboard activeSubTab={activeSubTab} />}
+                  {activeTab === 'scheduling' && <AppointmentHub activeSubTab={activeSubTab} setActiveSubTab={setActiveSubTab} />}
                   {activeTab === 'analytics' && <AnalyticsDashboard />}
                 </div>
               </div>

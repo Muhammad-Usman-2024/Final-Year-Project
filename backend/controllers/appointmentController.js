@@ -2,8 +2,8 @@ import asyncHandler from 'express-async-handler';
 import Slot from '../models/Slot.js';
 import Appointment from '../models/Appointment.js';
 import Waitlist from '../models/Waitlist.js';
-import Notification from '../models/Notification.js';
 import { ApiResponse, ApiError } from '../utils/ApiResponse.js';
+import { notifySuperAdmin, notifyUser } from '../utils/notificationEvents.js';
 
 // @desc    Get available slots for a hospital on a date
 // @route   GET /api/appointments/slots/:hospitalId
@@ -45,6 +45,33 @@ export const bookAppointment = asyncHandler(async (req, res) => {
         meetingLink: type === 'Consultation' ? `https://meet.jit.si/blood-platform-${Math.random().toString(36).substring(7)}` : null
     });
 
+    await notifyUser(req.user._id, {
+        type: 'appointment_update',
+        priority: 'medium',
+        title: `${type} appointment confirmed`,
+        message: `Your ${type.toLowerCase()} appointment is scheduled for ${slot.date} at ${slot.time}.`,
+        link: '/dashboard/scheduling',
+        metadata: { appointmentId: appointment._id, slotId: slot._id, type }
+    });
+
+    await notifyUser(slot.hospitalId, {
+        type: 'appointment_update',
+        priority: 'medium',
+        title: `New ${type} booking`,
+        message: `${req.user.fullName} booked ${slot.date} at ${slot.time}.`,
+        link: '/dashboard/scheduling',
+        metadata: { appointmentId: appointment._id, userId: req.user._id, type }
+    });
+
+    await notifySuperAdmin({
+        type: 'appointment_update',
+        priority: 'low',
+        title: 'Appointment booked',
+        message: `${req.user.fullName} booked a ${type} appointment.`,
+        link: '/admin/overview',
+        metadata: { appointmentId: appointment._id, type }
+    });
+
     return res.status(201).json(new ApiResponse(201, appointment, 'Appointment booked successfully'));
 });
 
@@ -57,6 +84,24 @@ export const cancelAppointment = asyncHandler(async (req, res) => {
     appointment.status = 'Cancelled';
     await appointment.save();
 
+    await notifyUser(appointment.userId, {
+        type: 'appointment_update',
+        priority: 'medium',
+        title: 'Appointment cancelled',
+        message: `Your ${appointment.type} appointment on ${appointment.date} has been cancelled.`,
+        link: '/dashboard/scheduling',
+        metadata: { appointmentId: appointment._id }
+    });
+
+    await notifyUser(appointment.hospitalId, {
+        type: 'appointment_update',
+        priority: 'medium',
+        title: 'Appointment cancelled',
+        message: `An appointment on ${appointment.date} was cancelled and the slot is available again.`,
+        link: '/dashboard/scheduling',
+        metadata: { appointmentId: appointment._id }
+    });
+
     // Release slot capacity
     const slot = await Slot.findById(appointment.slotId);
     if (slot) {
@@ -66,12 +111,13 @@ export const cancelAppointment = asyncHandler(async (req, res) => {
         // Check Waitlist
         const nextInLine = await Waitlist.findOne({ slotId: slot._id, isNotified: false }).sort({ priority: -1, createdAt: 1 });
         if (nextInLine) {
-            await Notification.create({
-                userId: nextInLine.userId,
+            await notifyUser(nextInLine.userId, {
                 type: 'slot_available',
+                priority: 'high',
                 title: 'Slot Available!',
-                body: `A slot just opened up at ${slot.time} on ${slot.date}. Book it now!`,
-                priority: 'High'
+                message: `A slot just opened up at ${slot.time} on ${slot.date}. Book it now!`,
+                link: '/dashboard/scheduling',
+                metadata: { slotId: slot._id }
             });
             nextInLine.isNotified = true;
             await nextInLine.save();
@@ -97,6 +143,24 @@ export const manageSlots = asyncHandler(async (req, res) => {
     }));
 
     await Slot.bulkWrite(operations);
+    await notifyUser(req.user._id, {
+        type: 'appointment_update',
+        priority: 'low',
+        title: 'Slots updated',
+        message: `Appointment slots for ${date} were updated successfully.`,
+        link: '/dashboard/scheduling',
+        metadata: { date, slotCount: slots.length }
+    });
+
+    await notifySuperAdmin({
+        type: 'appointment_update',
+        priority: 'low',
+        title: 'Hospital slots updated',
+        message: `${req.user.fullName} updated ${slots.length} appointment slots for ${date}.`,
+        link: '/admin/overview',
+        metadata: { hospitalId: req.user._id, date, slotCount: slots.length }
+    });
+
     return res.status(200).json(new ApiResponse(200, null, 'Slots updated successfully'));
 });
 

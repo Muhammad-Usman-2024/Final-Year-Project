@@ -31,7 +31,7 @@ const userSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        enum: ['Admin', 'Donor', 'Patient', 'Hospital', 'Doctor'],
+        enum: ['SuperAdmin', 'Donor', 'Patient', 'Hospital', 'Doctor'],
         default: 'Donor'
     },
     bloodGroup: {
@@ -61,6 +61,10 @@ const userSchema = new mongoose.Schema({
     isVerified: {
         type: Boolean,
         default: false
+    },
+    isActive: {
+        type: Boolean,
+        default: true
     },
     verificationToken: String,
     refreshToken: String,

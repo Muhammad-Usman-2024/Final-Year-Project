@@ -12,7 +12,7 @@ import { protect, authorize } from '../middleware/authMiddleware.js';
 
 // All admin routes are strictly protected
 router.use(protect);
-router.use(authorize('Admin'));
+router.use(authorize('SuperAdmin'));
 
 router.get('/overview', getAdminOverview);
 router.get('/users', getAllUsers);

@@ -17,7 +17,7 @@ const AdminDashboard = ({ activeSubTab }) => {
                         <ShieldCheck size={28} />
                     </div>
                     <div>
-                        <h1 className="text-3xl font-bold tracking-tight">Admin Command Center</h1>
+                        <h1 className="text-3xl font-bold tracking-tight">SuperAdmin Command Center</h1>
                         <p className="text-gray-500 text-sm">Global system management and auditing.</p>
                     </div>
                 </div>

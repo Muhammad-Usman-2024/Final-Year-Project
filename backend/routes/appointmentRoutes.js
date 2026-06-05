@@ -17,6 +17,6 @@ router.post('/book', bookAppointment);
 router.put('/:id/cancel', cancelAppointment);
 
 // Hospital only management
-router.post('/slots/manage', authorize('Hospital', 'Admin'), manageSlots);
+router.post('/slots/manage', authorize('Hospital', 'SuperAdmin'), manageSlots);
 
 export default router;

@@ -34,6 +34,11 @@ const bloodRequestSchema = new mongoose.Schema({
         default: 'Pending'
     },
     patientId: String, // Optional but recommended
+    approvedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    },
+    approvedAt: Date,
     fulfilledBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'

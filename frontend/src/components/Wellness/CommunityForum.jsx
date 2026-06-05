@@ -57,7 +57,7 @@ const CommunityForum = () => {
                 ></textarea>
                 <div className="flex justify-between items-center">
                     <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest flex items-center gap-1">
-                        <ShieldCheck size={12} className="text-accent-green" /> Admin Moderated
+                        <ShieldCheck size={12} className="text-accent-green" /> SuperAdmin Moderated
                     </p>
                     <button 
                         disabled={submitting || !content.trim()}

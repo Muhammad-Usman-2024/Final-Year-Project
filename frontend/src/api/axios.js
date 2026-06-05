@@ -58,11 +58,20 @@ api.interceptors.response.use(
         return api(originalRequest);
       } catch (refreshError) {
         // Refresh failed, logout user
+        localStorage.removeItem('user');
         if (store) {
-          const { logout } = await import('../store/authSlice');
-          store.dispatch(logout());
+          const { clearAuth } = await import('../store/authSlice');
+          store.dispatch(clearAuth());
         }
         return Promise.reject(refreshError);
+      }
+    }
+
+    if (error.response?.status === 403 && error.response?.data?.message?.toLowerCase().includes('inactive')) {
+      localStorage.removeItem('user');
+      if (store) {
+        const { clearAuth } = await import('../store/authSlice');
+        store.dispatch(clearAuth());
       }
     }
 

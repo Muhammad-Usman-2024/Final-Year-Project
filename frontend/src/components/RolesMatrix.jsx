@@ -3,12 +3,12 @@ import { Check, X } from 'lucide-react';
 
 const RolesMatrix = () => {
   const permissions = [
-    { action: 'Donate Blood', donor: true, patient: false, hospital: false, doctor: false },
-    { action: 'Request Blood', donor: false, patient: true, hospital: true, doctor: true },
-    { action: 'Manage Inventory', donor: false, patient: false, hospital: true, doctor: false },
-    { action: 'Verify Medical Reports', donor: false, patient: false, hospital: false, doctor: true },
-    { action: 'View Thalassemia Directory', donor: true, patient: true, hospital: true, doctor: true },
-    { action: 'Access Admin Panel', donor: false, patient: false, hospital: false, doctor: false, admin: true },
+    { action: 'Donate Blood', donor: true, patient: false, hospital: false, doctor: false, superAdmin: false },
+    { action: 'Request Blood', donor: false, patient: true, hospital: true, doctor: true, superAdmin: false },
+    { action: 'Manage Inventory', donor: false, patient: false, hospital: true, doctor: false, superAdmin: true },
+    { action: 'Verify Medical Reports', donor: false, patient: false, hospital: false, doctor: true, superAdmin: true },
+    { action: 'View Thalassemia Directory', donor: true, patient: true, hospital: true, doctor: true, superAdmin: true },
+    { action: 'Access SuperAdmin Panel', donor: false, patient: false, hospital: false, doctor: false, superAdmin: true },
   ];
 
   return (
@@ -23,6 +23,7 @@ const RolesMatrix = () => {
               <th className="p-4 text-sm font-semibold text-center">Patient</th>
               <th className="p-4 text-sm font-semibold text-center">Hospital</th>
               <th className="p-4 text-sm font-semibold text-center">Doctor</th>
+              <th className="p-4 text-sm font-semibold text-center">SuperAdmin</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border-color">
@@ -33,6 +34,7 @@ const RolesMatrix = () => {
                 <td className="p-4 text-center">{p.patient ? <Check size={18} className="mx-auto text-accent-green" /> : <X size={18} className="mx-auto text-accent-red" />}</td>
                 <td className="p-4 text-center">{p.hospital ? <Check size={18} className="mx-auto text-accent-green" /> : <X size={18} className="mx-auto text-accent-red" />}</td>
                 <td className="p-4 text-center">{p.doctor ? <Check size={18} className="mx-auto text-accent-green" /> : <X size={18} className="mx-auto text-accent-red" />}</td>
+                <td className="p-4 text-center">{p.superAdmin ? <Check size={18} className="mx-auto text-accent-green" /> : <X size={18} className="mx-auto text-accent-red" />}</td>
               </tr>
             ))}
           </tbody>

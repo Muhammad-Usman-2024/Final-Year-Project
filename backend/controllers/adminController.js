@@ -5,6 +5,7 @@ import BroadcastMessage from '../models/BroadcastMessage.js';
 import PatientProfile from '../models/PatientProfile.js';
 import BloodUnit from '../models/BloodUnit.js';
 import { ApiResponse, ApiError } from '../utils/ApiResponse.js';
+import { notifySuperAdmin, notifyUser, notifyUsersByRole } from '../utils/notificationEvents.js';
 
 // @desc    Get system overview stats
 // @route   GET /api/admin/overview
@@ -64,9 +65,12 @@ export const getAllUsers = asyncHandler(async (req, res) => {
 // @route   PUT /api/admin/user/:id/role
 export const updateUserRole = asyncHandler(async (req, res) => {
     const { role } = req.body;
+    const allowedRoles = ['Donor', 'Patient', 'Hospital', 'Doctor'];
     const user = await User.findById(req.params.id);
 
     if (!user) throw new ApiError(404, 'User not found');
+    if (user.role === 'SuperAdmin') throw new ApiError(403, 'SuperAdmin role cannot be changed');
+    if (!allowedRoles.includes(role)) throw new ApiError(400, 'This role cannot be assigned');
 
     const oldRole = user.role;
     user.role = role;
@@ -80,6 +84,24 @@ export const updateUserRole = asyncHandler(async (req, res) => {
         details: `Changed role from ${oldRole} to ${role}`
     });
 
+    await notifyUser(user._id, {
+        type: 'user_management',
+        priority: 'medium',
+        title: 'Role updated',
+        message: `Your account role was changed from ${oldRole} to ${role}.`,
+        link: '/dashboard/profile',
+        metadata: { oldRole, role }
+    });
+
+    await notifySuperAdmin({
+        type: 'user_management',
+        priority: 'low',
+        title: 'User role changed',
+        message: `${user.fullName}'s role changed from ${oldRole} to ${role}.`,
+        link: '/admin/users',
+        metadata: { userId: user._id, oldRole, role }
+    });
+
     return res.status(200).json(new ApiResponse(200, user, 'Role updated successfully'));
 });
 
@@ -88,8 +110,14 @@ export const updateUserRole = asyncHandler(async (req, res) => {
 export const toggleUserStatus = asyncHandler(async (req, res) => {
     const user = await User.findById(req.params.id);
     if (!user) throw new ApiError(404, 'User not found');
+    if (user.role === 'SuperAdmin') throw new ApiError(403, 'SuperAdmin status cannot be changed');
 
-    user.isActive = !user.isActive;
+    const currentStatus = user.isActive !== false;
+    user.isActive = !currentStatus;
+    user.personalInfo = {
+        ...user.personalInfo,
+        accountStatus: user.isActive ? 'Verified' : 'Suspended'
+    };
     await user.save();
 
     await AuditLog.create({
@@ -97,6 +125,15 @@ export const toggleUserStatus = asyncHandler(async (req, res) => {
         action: 'STATUS_TOGGLE',
         resource: `User: ${user.email}`,
         details: `Status changed to ${user.isActive ? 'Active' : 'Inactive'}`
+    });
+
+    await notifyUser(user._id, {
+        type: 'user_management',
+        priority: 'high',
+        title: `Account ${user.isActive ? 'activated' : 'deactivated'}`,
+        message: `Your account status is now ${user.isActive ? 'active' : 'inactive'}.`,
+        link: '/dashboard/profile',
+        metadata: { isActive: user.isActive }
     });
 
     return res.status(200).json(new ApiResponse(200, user, 'User status toggled'));
@@ -136,6 +173,24 @@ export const sendBroadcast = asyncHandler(async (req, res) => {
         action: 'BROADCAST_SENT',
         resource: 'Broadcast System',
         details: `Sent "${title}" to ${targetRoles.join(', ')}`
+    });
+
+    await notifyUsersByRole(targetRoles, {
+        type: 'broadcast_alert',
+        priority: 'high',
+        title,
+        message: body,
+        link: '/dashboard/notifications',
+        metadata: { broadcastId: broadcast._id, targetRoles }
+    });
+
+    await notifySuperAdmin({
+        type: 'broadcast_alert',
+        priority: 'low',
+        title: 'Broadcast sent',
+        message: `"${title}" was sent to ${targetRoles.join(', ')}.`,
+        link: '/admin/broadcast',
+        metadata: { broadcastId: broadcast._id, targetRoles }
     });
 
     return res.status(201).json(new ApiResponse(201, broadcast, 'Broadcast sent successfully'));

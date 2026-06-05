@@ -9,7 +9,7 @@ const BroadcastManager = () => {
     const [loading, setLoading] = useState(false);
     const [sent, setSent] = useState(false);
 
-    const roles = ['Patient', 'Donor', 'Hospital', 'Doctor', 'Admin'];
+    const roles = ['Patient', 'Donor', 'Hospital', 'Doctor'];
 
     const handleToggleRole = (role) => {
         if (targetRoles.includes(role)) {

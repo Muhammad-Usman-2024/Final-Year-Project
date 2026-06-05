@@ -2,12 +2,14 @@ import React, { useState } from 'react';
 import { User, Phone, MapPin, Calendar, Activity, Save, Loader2, ClipboardList, ShieldCheck } from 'lucide-react';
 import { profileService } from '../../api/apiService';
 import toast from 'react-hot-toast';
+import { formatPhoneNumber } from '../../utils/phoneFormat';
 
 const EditProfile = ({ data, onUpdate }) => {
+  const isSuperAdmin = data?.user?.role === 'SuperAdmin';
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     fullName: data?.user?.fullName || '',
-    phone: data?.user?.phone || '',
+    phone: data?.user?.phone ? formatPhoneNumber(data.user.phone) : '',
     personalInfo: {
       dob: data?.user?.personalInfo?.dob?.split('T')[0] || '',
       gender: data?.user?.personalInfo?.gender || 'Male',
@@ -49,12 +51,13 @@ const EditProfile = ({ data, onUpdate }) => {
       // Update Personal Info
       await profileService.updateProfile({
         fullName: formData.fullName,
-        phone: formData.phone,
-        personalInfo: formData.personalInfo
+        phone: formatPhoneNumber(formData.phone),
+        personalInfo: isSuperAdmin ? {} : formData.personalInfo
       });
 
-      // Update Medical History
-      await profileService.updateMedicalHistory(formData.medicalHistory);
+      if (!isSuperAdmin) {
+        await profileService.updateMedicalHistory(formData.medicalHistory);
+      }
 
       toast.success('Profile updated successfully!');
       if (onUpdate) onUpdate();
@@ -100,13 +103,13 @@ const EditProfile = ({ data, onUpdate }) => {
                   className="input-field pl-10" 
                   value={formData.phone}
                   onChange={handleChange}
-                  placeholder="Enter phone number"
+                  placeholder="+92 3XX XXX XXXX"
                   required
                 />
               </div>
             </div>
 
-            <div className="space-y-2">
+            {!isSuperAdmin && <div className="space-y-2">
               <label className="text-sm text-gray-400">Date of Birth</label>
               <div className="relative">
                 <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
@@ -118,9 +121,9 @@ const EditProfile = ({ data, onUpdate }) => {
                   onChange={(e) => handleChange(e, 'personalInfo')}
                 />
               </div>
-            </div>
+            </div>}
 
-            <div className="space-y-2">
+            {!isSuperAdmin && <div className="space-y-2">
               <label className="text-sm text-gray-400">Gender</label>
               <select 
                 name="gender"
@@ -132,9 +135,9 @@ const EditProfile = ({ data, onUpdate }) => {
                 <option value="Female">Female</option>
                 <option value="Other">Other</option>
               </select>
-            </div>
+            </div>}
 
-            <div className="space-y-2">
+            {!isSuperAdmin && <div className="space-y-2">
               <label className="text-sm text-gray-400">City</label>
               <div className="relative">
                 <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
@@ -146,9 +149,9 @@ const EditProfile = ({ data, onUpdate }) => {
                   placeholder="Enter city"
                 />
               </div>
-            </div>
+            </div>}
 
-            <div className="space-y-2 md:col-span-2">
+            {!isSuperAdmin && <div className="space-y-2 md:col-span-2">
               <label className="text-sm text-gray-400">Address</label>
               <textarea 
                 name="address"
@@ -157,12 +160,12 @@ const EditProfile = ({ data, onUpdate }) => {
                 onChange={(e) => handleChange(e, 'personalInfo')}
                 placeholder="Enter complete address"
               />
-            </div>
+            </div>}
           </div>
         </div>
 
         {/* Medical History Section */}
-        <div className="bg-card-bg border border-border-color p-8 rounded-[20px] space-y-6">
+        {!isSuperAdmin && <div className="bg-card-bg border border-border-color p-8 rounded-[20px] space-y-6">
           <h3 className="text-xs font-bold uppercase tracking-widest text-gray-500 flex items-center gap-2">
             <ClipboardList size={14} /> Medical History
           </h3>
@@ -231,7 +234,7 @@ const EditProfile = ({ data, onUpdate }) => {
               </div>
             </div>
           </div>
-        </div>
+        </div>}
 
         <button 
           type="submit" 

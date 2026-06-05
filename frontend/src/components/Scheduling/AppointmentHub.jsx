@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import { Calendar, Clock, BookOpen, CheckCircle, Hospital, User, Video, Plus } from 'lucide-react';
 import SlotPicker from './SlotPicker';
 import AppointmentPass from './AppointmentPass';
@@ -8,6 +8,20 @@ import { useSelector } from 'react-redux';
 
 const AppointmentHub = ({ activeSubTab, setActiveSubTab }) => {
     const { user } = useSelector(state => state.auth);
+    const allowedSubTabsByRole = {
+        Donor: ['book', 'my'],
+        Patient: ['book', 'my'],
+        Hospital: ['manage', 'my'],
+        Doctor: ['manage', 'my'],
+    };
+
+    const allowedSubTabs = allowedSubTabsByRole[user?.role] || ['my'];
+
+    useEffect(() => {
+        if (!allowedSubTabs.includes(activeSubTab)) {
+            setActiveSubTab(allowedSubTabs[0]);
+        }
+    }, [activeSubTab, allowedSubTabs, setActiveSubTab]);
 
     return (
         <div className="max-w-7xl mx-auto p-4 md:p-8 space-y-10 fade-in pb-24">
@@ -20,9 +34,9 @@ const AppointmentHub = ({ activeSubTab, setActiveSubTab }) => {
             </div>
 
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                {activeSubTab === 'book' && <SlotPicker />}
-                {activeSubTab === 'my' && <MyAppointments />}
-                {activeSubTab === 'manage' && <HospitalSlotManager />}
+                {activeSubTab === 'book' && allowedSubTabs.includes('book') && <SlotPicker />}
+                {activeSubTab === 'my' && allowedSubTabs.includes('my') && <MyAppointments />}
+                {activeSubTab === 'manage' && allowedSubTabs.includes('manage') && <HospitalSlotManager />}
             </div>
         </div>
     );

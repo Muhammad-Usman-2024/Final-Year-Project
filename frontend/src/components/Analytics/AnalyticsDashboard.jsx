@@ -10,9 +10,9 @@ const AnalyticsDashboard = () => {
     const [activeSection, setActiveSection] = useState('trends');
 
     const sections = [
-        { id: 'trends', label: 'Donation Trends', icon: <TrendingUp size={18} />, roles: ['Admin', 'Hospital'] },
-        { id: 'health', label: 'Patient Health', icon: <Activity size={18} />, roles: ['Admin', 'Doctor'] },
-        { id: 'hospitals', label: 'Hospital Perf', icon: <Home size={18} />, roles: ['Admin'] },
+        { id: 'trends', label: 'Donation Trends', icon: <TrendingUp size={18} />, roles: ['SuperAdmin', 'Hospital'] },
+        { id: 'health', label: 'Patient Health', icon: <Activity size={18} />, roles: ['SuperAdmin', 'Doctor'] },
+        { id: 'hospitals', label: 'Hospital Perf', icon: <Home size={18} />, roles: ['SuperAdmin'] },
     ];
 
     const filteredSections = sections.filter(s => s.roles.includes(user.role));

@@ -3,6 +3,8 @@ import User from '../models/User.js';
 import DonorProfile from '../models/DonorProfile.js';
 import PatientProfile from '../models/PatientProfile.js';
 import { ApiResponse, ApiError } from '../utils/ApiResponse.js';
+import { notifySuperAdmin, notifyUser } from '../utils/notificationEvents.js';
+import { formatPhoneNumber } from '../utils/phoneFormat.js';
 
 // @desc    Get user profile
 // @route   GET /api/profile/:id
@@ -30,10 +32,18 @@ export const updateProfile = asyncHandler(async (req, res) => {
     // Update only allowed fields
     const { fullName, phone, personalInfo } = req.body;
     user.fullName = fullName || user.fullName;
-    user.phone = phone || user.phone;
+    user.phone = phone ? formatPhoneNumber(phone) : user.phone;
     user.personalInfo = { ...user.personalInfo, ...personalInfo };
 
     const updatedUser = await user.save();
+    await notifyUser(user._id, {
+        type: 'profile_update',
+        priority: 'low',
+        title: 'Profile updated',
+        message: 'Your personal profile information was updated successfully.',
+        link: '/dashboard/profile'
+    });
+
     return res.status(200).json(new ApiResponse(200, updatedUser, 'Profile updated successfully'));
 });
 
@@ -45,6 +55,22 @@ export const updateMedicalHistory = asyncHandler(async (req, res) => {
 
     user.medicalHistory = { ...user.medicalHistory, ...req.body };
     const updatedUser = await user.save();
+    await notifyUser(user._id, {
+        type: 'medical_update',
+        priority: 'medium',
+        title: 'Medical history updated',
+        message: 'Your medical history has been updated.',
+        link: '/dashboard/profile'
+    });
+
+    await notifySuperAdmin({
+        type: 'medical_update',
+        priority: 'low',
+        title: 'Medical history changed',
+        message: `${user.fullName} updated medical history.`,
+        link: '/admin/users',
+        metadata: { userId: user._id, role: user.role }
+    });
 
     return res.status(200).json(new ApiResponse(200, updatedUser, 'Medical history updated'));
 });
@@ -86,6 +112,13 @@ export const addTransfusion = asyncHandler(async (req, res) => {
 
     profile.transfusions.push(req.body);
     await profile.save();
+    await notifyUser(req.user._id, {
+        type: 'medical_update',
+        priority: 'medium',
+        title: 'Transfusion record added',
+        message: 'A new transfusion record has been added to your profile.',
+        link: '/dashboard/profile'
+    });
 
     return res.status(201).json(new ApiResponse(201, profile, 'Transfusion added'));
 });

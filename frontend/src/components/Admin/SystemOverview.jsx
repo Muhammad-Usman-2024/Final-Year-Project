@@ -27,7 +27,7 @@ const SystemOverview = () => {
             <Shield size={48} className="text-accent-red mb-4 opacity-50" />
             <h3 className="text-xl font-bold text-white mb-2">Access Restricted</h3>
             <p className="text-gray-500 max-w-md">
-                You don't have permission to view system stats. Please ensure you are logged in as an Administrator.
+                You don't have permission to view system stats. Please ensure you are logged in as the SuperAdmin.
             </p>
             <button 
                 onClick={() => window.location.reload()} 

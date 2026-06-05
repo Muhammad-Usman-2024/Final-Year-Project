@@ -3,6 +3,7 @@ import User from '../models/User.js';
 import DonorProfile from '../models/DonorProfile.js';
 import BloodUnit from '../models/BloodUnit.js';
 import { ApiResponse, ApiError } from '../utils/ApiResponse.js';
+import { notifySuperAdmin, notifyUser } from '../utils/notificationEvents.js';
 
 // Helper: Blood Compatibility Matrix
 const getCompatibleGroups = (group) => {
@@ -99,12 +100,42 @@ export const getNearbyBanks = asyncHandler(async (req, res) => {
 // @desc    Mock urgent broadcast
 // @route   POST /api/search/broadcast
 export const broadcastRequest = asyncHandler(async (req, res) => {
-    // In real app, this would trigger Socket.io / Push Notifications / SMS
-    return res.status(200).json(new ApiResponse(200, null, 'Urgent broadcast sent to nearby matching donors!'));
+    const { bloodGroup, city, hospitalName } = req.body;
+
+    if (!bloodGroup || !city) {
+        throw new ApiError(400, 'Blood group and city are required');
+    }
+
+    const compatibleGroups = getCompatibleGroups(bloodGroup);
+    const donors = await User.find({
+        role: 'Donor',
+        bloodGroup: { $in: compatibleGroups },
+        'personalInfo.city': new RegExp(city, 'i')
+    }).select('_id fullName');
+
+    await Promise.all(donors.map(donor => notifyUser(donor._id, {
+        type: 'blood_request',
+        priority: 'critical',
+        title: `Urgent ${bloodGroup} blood needed`,
+        message: `${hospitalName || req.user.fullName} needs ${bloodGroup} blood in ${city}.`,
+        link: '/dashboard/notifications',
+        metadata: { bloodGroup, city, requestedBy: req.user._id }
+    })));
+
+    await notifySuperAdmin({
+        type: 'broadcast_alert',
+        priority: 'high',
+        title: 'Urgent search broadcast sent',
+        message: `${donors.length} compatible donor(s) were alerted for ${bloodGroup} in ${city}.`,
+        link: '/admin/broadcast',
+        metadata: { bloodGroup, city, alertedCount: donors.length }
+    });
+
+    return res.status(200).json(new ApiResponse(200, { alertedCount: donors.length }, 'Urgent broadcast sent to nearby matching donors!'));
 });
 // @desc    Get all hospitals
 // @route   GET /api/search/hospitals
 export const getAllHospitals = asyncHandler(async (req, res) => {
-    const hospitals = await User.find({ role: 'Hospital' }).select('-password');
+    const hospitals = await User.find({ role: 'Hospital', isActive: { $ne: false } }).select('-password');
     return res.status(200).json(new ApiResponse(200, hospitals, 'Hospitals fetched successfully'));
 });

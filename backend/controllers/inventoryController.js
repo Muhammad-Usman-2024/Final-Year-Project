@@ -3,6 +3,7 @@ import BloodUnit from '../models/BloodUnit.js';
 import BloodRequest from '../models/BloodRequest.js';
 import { ApiResponse, ApiError } from '../utils/ApiResponse.js';
 import { isCompatible } from '../utils/compatibilityUtil.js';
+import { notifySuperAdmin, notifyUser } from '../utils/notificationEvents.js';
 
 
 // @desc    Get aggregated stock status
@@ -64,6 +65,24 @@ export const addInventory = asyncHandler(async (req, res) => {
         group, component, units, collectedDate, expiryDate, hospitalId, batchId, source
     });
 
+    await notifyUser(hospitalId || req.user._id, {
+        type: 'inventory_update',
+        priority: 'medium',
+        title: 'Blood stock added',
+        message: `${units} unit(s) of ${group} ${component} were added to inventory.`,
+        link: '/dashboard/inventory',
+        metadata: { bloodUnitId: bloodUnit._id, group, component, units }
+    });
+
+    await notifySuperAdmin({
+        type: 'inventory_update',
+        priority: 'low',
+        title: 'Inventory updated',
+        message: `${req.user.fullName} added ${units} unit(s) of ${group} ${component}.`,
+        link: '/admin/overview',
+        metadata: { bloodUnitId: bloodUnit._id, hospitalId: hospitalId || req.user._id }
+    });
+
     return res.status(201).json(new ApiResponse(201, bloodUnit, 'Blood unit added to inventory'));
 });
 
@@ -71,12 +90,92 @@ export const addInventory = asyncHandler(async (req, res) => {
 // @route   POST /api/inventory/request
 export const requestBlood = asyncHandler(async (req, res) => {
     const { bloodGroup, component, units, requestingHospital, priority, requiredBy, patientId } = req.body;
+    const hospitalName = requestingHospital || req.user.hospitalName || req.user.fullName;
 
     const request = await BloodRequest.create({
-        bloodGroup, component, units, requestingHospital, priority, requiredBy, patientId
+        bloodGroup, component, units, requestingHospital: hospitalName, priority, requiredBy, patientId
     });
 
+    await notifySuperAdmin({
+        type: 'blood_request',
+        priority: priority === 'Emergency' ? 'critical' : 'high',
+        title: 'New blood request',
+        message: `${hospitalName} requested ${units} unit(s) of ${bloodGroup} ${component}.`,
+        link: '/admin/overview',
+        metadata: { requestId: request._id, bloodGroup, component, units }
+    });
+
+    if (patientId) {
+        await notifyUser(patientId, {
+            type: 'blood_request',
+            priority: priority === 'Emergency' ? 'critical' : 'high',
+            title: 'Blood request submitted',
+            message: `Your request for ${bloodGroup} ${component} has been submitted.`,
+            link: '/dashboard/search',
+            metadata: { requestId: request._id, bloodGroup, component, units }
+        });
+    }
+
     return res.status(201).json(new ApiResponse(201, request, 'Blood request submitted'));
+});
+
+// @desc    Get blood requests
+// @route   GET /api/inventory/requests
+export const getBloodRequests = asyncHandler(async (req, res) => {
+    const query = {};
+
+    if (req.user.role === 'Hospital') {
+        query.requestingHospital = req.user.hospitalName || req.user.fullName;
+    }
+
+    const requests = await BloodRequest.find(query)
+        .populate('approvedBy', 'fullName email role')
+        .populate('fulfilledBy', 'fullName email role')
+        .sort({ createdAt: -1 });
+
+    return res.status(200).json(new ApiResponse(200, requests, 'Blood requests fetched'));
+});
+
+// @desc    Approve blood request
+// @route   PUT /api/inventory/request/:id/approve
+export const approveRequest = asyncHandler(async (req, res) => {
+    const request = await BloodRequest.findById(req.params.id);
+    if (!request) throw new ApiError(404, 'Request not found');
+    if (request.status !== 'Pending') {
+        throw new ApiError(400, `Only pending requests can be approved. Current status is ${request.status}.`);
+    }
+
+    const totalAvailable = await BloodUnit.aggregate([
+        {
+            $match: {
+                group: request.bloodGroup,
+                component: request.component,
+                status: 'Available'
+            }
+        },
+        { $group: { _id: null, totalUnits: { $sum: '$units' } } }
+    ]);
+
+    const availableUnits = totalAvailable[0]?.totalUnits || 0;
+    if (availableUnits < request.units) {
+        throw new ApiError(400, `Insufficient stock. Only ${availableUnits} units available.`);
+    }
+
+    request.status = 'Approved';
+    request.approvedBy = req.user._id;
+    request.approvedAt = Date.now();
+    await request.save();
+
+    await notifySuperAdmin({
+        type: 'blood_request',
+        priority: 'medium',
+        title: 'Blood request approved',
+        message: `${request.units} unit(s) of ${request.bloodGroup} ${request.component} request was approved.`,
+        link: '/admin/overview',
+        metadata: { requestId: request._id, approvedBy: req.user._id }
+    });
+
+    return res.status(200).json(new ApiResponse(200, request, 'Request approved successfully'));
 });
 
 // @desc    Fulfill blood request
@@ -84,6 +183,9 @@ export const requestBlood = asyncHandler(async (req, res) => {
 export const fulfillRequest = asyncHandler(async (req, res) => {
     const request = await BloodRequest.findById(req.params.id);
     if (!request) throw new ApiError(404, 'Request not found');
+    if (request.status !== 'Approved') {
+        throw new ApiError(400, `Request must be approved before dispatch. Current status is ${request.status}.`);
+    }
 
     // Check if enough stock exists
     const availableUnits = await BloodUnit.find({
@@ -119,6 +221,26 @@ export const fulfillRequest = asyncHandler(async (req, res) => {
     request.fulfilledAt = Date.now();
     await request.save();
 
+    await notifySuperAdmin({
+        type: 'request_fulfilled',
+        priority: 'medium',
+        title: 'Blood request fulfilled',
+        message: `${request.units} unit(s) of ${request.bloodGroup} ${request.component} were dispatched.`,
+        link: '/admin/overview',
+        metadata: { requestId: request._id, fulfilledBy: req.user._id }
+    });
+
+    if (request.patientId) {
+        await notifyUser(request.patientId, {
+            type: 'request_fulfilled',
+            priority: 'high',
+            title: 'Blood request dispatched',
+            message: `${request.units} unit(s) of ${request.bloodGroup} ${request.component} have been dispatched.`,
+            link: '/dashboard/notifications',
+            metadata: { requestId: request._id }
+        });
+    }
+
     return res.status(200).json(new ApiResponse(200, request, 'Request fulfilled and dispatched'));
 });
 
@@ -133,6 +255,17 @@ export const getExpiryAlerts = asyncHandler(async (req, res) => {
         status: 'Available',
         expiryDate: { $lte: alertDate, $gte: today }
     }).sort({ expiryDate: 1 });
+
+    if (alerts.length > 0) {
+        await notifySuperAdmin({
+            type: 'expiry_alert',
+            priority: 'high',
+            title: 'Blood stock expiring soon',
+            message: `${alerts.length} blood unit record(s) will expire within the next 7 days.`,
+            link: '/admin/overview',
+            metadata: { count: alerts.length }
+        });
+    }
 
     return res.status(200).json(new ApiResponse(200, alerts, 'Expiry alerts fetched'));
 });

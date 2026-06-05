@@ -11,7 +11,7 @@ const broadcastMessageSchema = new mongoose.Schema({
     },
     targetRoles: [{
         type: String,
-        enum: ['Patient', 'Donor', 'Hospital', 'Doctor', 'Admin']
+        enum: ['Patient', 'Donor', 'Hospital', 'Doctor']
     }],
     sentBy: {
         type: mongoose.Schema.Types.ObjectId,

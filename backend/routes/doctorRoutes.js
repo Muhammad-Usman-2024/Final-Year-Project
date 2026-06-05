@@ -13,9 +13,9 @@ import {
 } from '../controllers/doctorController.js';
 import { protect, authorize } from '../middleware/authMiddleware.js';
 
-// All doctor routes require 'Doctor' or 'Admin' role
+// All doctor routes require 'Doctor' or 'SuperAdmin' role
 router.use(protect);
-router.use(authorize('Doctor', 'Admin'));
+router.use(authorize('Doctor', 'SuperAdmin'));
 
 router.get('/patients', getDoctorPatients);
 

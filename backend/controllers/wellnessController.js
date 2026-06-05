@@ -3,6 +3,7 @@ import MoodLog from '../models/MoodLog.js';
 import WellnessContent from '../models/WellnessContent.js';
 import ForumPost from '../models/ForumPost.js';
 import { ApiResponse, ApiError } from '../utils/ApiResponse.js';
+import { notifySuperAdmin, notifyUser } from '../utils/notificationEvents.js';
 
 // @desc    Get Verse of the Day based on role
 // @route   GET /api/wellness/verse-of-day
@@ -44,6 +45,15 @@ export const submitMood = asyncHandler(async (req, res) => {
         role: req.user.role
     });
 
+    await notifyUser(req.user._id, {
+        type: 'system',
+        priority: 'low',
+        title: 'Mood logged',
+        message: `Your ${mood} mood check-in was saved.`,
+        link: '/dashboard/wellness',
+        metadata: { moodLogId: moodLog._id, score, mood }
+    });
+
     return res.status(201).json(new ApiResponse(201, moodLog, 'Mood submitted successfully'));
 });
 
@@ -79,6 +89,24 @@ export const createForumPost = asyncHandler(async (req, res) => {
     const post = await ForumPost.create({
         userId: req.user._id,
         content
+    });
+
+    await notifyUser(req.user._id, {
+        type: 'system',
+        priority: 'low',
+        title: 'Community post submitted',
+        message: 'Your post was submitted for SuperAdmin moderation.',
+        link: '/dashboard/wellness',
+        metadata: { postId: post._id }
+    });
+
+    await notifySuperAdmin({
+        type: 'system',
+        priority: 'medium',
+        title: 'Community post needs review',
+        message: `${req.user.fullName} submitted a new community post.`,
+        link: '/admin/overview',
+        metadata: { postId: post._id, userId: req.user._id }
     });
 
     return res.status(201).json(new ApiResponse(201, post, 'Post submitted for moderation'));

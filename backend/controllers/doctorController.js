@@ -5,6 +5,7 @@ import ClinicalNote from '../models/ClinicalNote.js';
 import Prescription from '../models/Prescription.js';
 import Referral from '../models/Referral.js';
 import { ApiResponse, ApiError } from '../utils/ApiResponse.js';
+import { notifySuperAdmin, notifyUser } from '../utils/notificationEvents.js';
 
 // @desc    Get all patients (for simplicity, returning all patients or assigned if there was logic)
 // @route   GET /api/doctor/patients
@@ -44,6 +45,15 @@ export const addClinicalNote = asyncHandler(async (req, res) => {
         plan
     });
 
+    await notifyUser(patientId, {
+        type: 'medical_update',
+        priority: 'medium',
+        title: 'Clinical note added',
+        message: `${req.user.fullName} added a new clinical note to your record.`,
+        link: '/dashboard/profile',
+        metadata: { noteId: note._id, doctorId }
+    });
+
     return res.status(201).json(new ApiResponse(201, note, 'Clinical note added successfully'));
 });
 
@@ -71,6 +81,15 @@ export const issuePrescription = asyncHandler(async (req, res) => {
         pmdcNumber,
         drugs,
         instructions
+    });
+
+    await notifyUser(patientId, {
+        type: 'medical_update',
+        priority: 'high',
+        title: 'New prescription issued',
+        message: `${req.user.fullName} issued a new digital prescription.`,
+        link: '/dashboard/profile',
+        metadata: { prescriptionId: prescription._id, doctorId }
     });
 
     return res.status(201).json(new ApiResponse(201, prescription, 'Prescription issued successfully'));
@@ -105,6 +124,15 @@ export const updateTreatmentPlan = asyncHandler(async (req, res) => {
     profile.set('treatmentPlan', { targetFerritin, targetHb, chelationPlan, transfusionFrequencyDays, updatedBy: req.user._id, updatedAt: new Date() });
     await profile.save({ strict: false }); // Bypass schema strictness for this dynamic update
 
+    await notifyUser(patientId, {
+        type: 'medical_update',
+        priority: 'high',
+        title: 'Treatment plan updated',
+        message: `${req.user.fullName} updated your treatment plan.`,
+        link: '/dashboard/profile',
+        metadata: { doctorId: req.user._id }
+    });
+
     return res.status(200).json(new ApiResponse(200, profile.treatmentPlan, 'Treatment plan updated'));
 });
 
@@ -125,6 +153,24 @@ export const createReferral = asyncHandler(async (req, res) => {
         specialty,
         reason,
         letterNotes
+    });
+
+    await notifyUser(patientId, {
+        type: 'medical_update',
+        priority: 'medium',
+        title: 'Referral created',
+        message: `${req.user.fullName} created a referral for ${specialty}.`,
+        link: '/dashboard/profile',
+        metadata: { referralId: referral._id, specialty, doctorId }
+    });
+
+    await notifySuperAdmin({
+        type: 'medical_update',
+        priority: 'low',
+        title: 'New patient referral',
+        message: `${req.user.fullName} referred a patient to ${specialty}.`,
+        link: '/admin/overview',
+        metadata: { referralId: referral._id, patientId, specialty }
     });
 
     return res.status(201).json(new ApiResponse(201, referral, 'Referral created successfully'));
@@ -155,6 +201,15 @@ export const uploadLabResult = asyncHandler(async (req, res) => {
     });
 
     await profile.save();
+
+    await notifyUser(patientId, {
+        type: 'medical_update',
+        priority: 'medium',
+        title: 'Lab result uploaded',
+        message: `${req.user.fullName} uploaded your ${testName} lab result.`,
+        link: '/dashboard/profile',
+        metadata: { testName, doctorId: req.user._id }
+    });
 
     return res.status(201).json(new ApiResponse(201, profile, 'Lab result uploaded successfully'));
 });

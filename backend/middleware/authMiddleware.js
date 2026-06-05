@@ -12,22 +12,30 @@ const protect = async (req, res, next) => {
 
     if (!token) {
         res.status(401);
-        throw new Error('Not authorized, no token');
+        return next(new Error('Not authorized, no token'));
     }
 
+    let decoded;
     try {
-        const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
-        req.user = await User.findById(decoded.id).select('-password');
-        if (!req.user) {
-            res.status(401);
-            throw new Error('Not authorized, user not found');
-        }
-        return next();
+        decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
     } catch (error) {
         console.error(error);
         res.status(401);
-        throw new Error('Not authorized, token failed');
+        return next(new Error('Not authorized, token failed'));
     }
+
+    req.user = await User.findById(decoded.id).select('-password');
+    if (!req.user) {
+        res.status(401);
+        return next(new Error('Not authorized, user not found'));
+    }
+
+    if (req.user.isActive === false && req.user.role !== 'SuperAdmin') {
+        res.status(403);
+        return next(new Error('Account is inactive. Please contact support.'));
+    }
+
+    return next();
 };
 
 const authorize = (...roles) => {

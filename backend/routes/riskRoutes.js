@@ -4,7 +4,7 @@ import { protect, authorize } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-// Only Doctors and Admins can predict risk
-router.get('/predict/:patientId', protect, authorize('Doctor', 'Admin'), predictPatientRisk);
+// Only Doctors and SuperAdmins can predict risk
+router.get('/predict/:patientId', protect, authorize('Doctor', 'SuperAdmin'), predictPatientRisk);
 
 export default router;

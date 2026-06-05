@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { register, reset } from '../store/authSlice';
 import { User, UserPlus, Phone, Mail, IdCard, Lock, ArrowUpRight, Activity, Hospital, ShieldCheck, ChevronDown, CheckCircle2, Eye, EyeOff } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { formatPhoneNumber } from '../utils/phoneFormat';
 
 const RegisterForm = () => {
   const [formData, setFormData] = useState({
@@ -49,7 +50,7 @@ const RegisterForm = () => {
     if (password !== confirmPassword) {
       toast.error('Passwords do not match');
     } else {
-      dispatch(register(formData));
+      dispatch(register({ ...formData, phone: formatPhoneNumber(formData.phone) }));
     }
   };
 
@@ -129,7 +130,7 @@ const RegisterForm = () => {
                 <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Phone Number</label>
                 <div className="relative group">
                     <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-red-500 transition-colors" size={18} />
-                    <input className="w-full pl-12 pr-4 py-4 bg-white border border-slate-200 rounded-2xl text-slate-900 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-red-500/10 focus:border-red-500 transition-all font-medium" type="text" name="phone" value={phone} onChange={onChange} placeholder="03XX-XXXXXXX" required />
+                    <input className="w-full pl-12 pr-4 py-4 bg-white border border-slate-200 rounded-2xl text-slate-900 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-red-500/10 focus:border-red-500 transition-all font-medium" type="text" name="phone" value={phone} onChange={onChange} placeholder="+92 3XX XXX XXXX" required />
                 </div>
             </div>
 

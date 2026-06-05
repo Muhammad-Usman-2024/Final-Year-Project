@@ -32,14 +32,14 @@ const ChatWidget = () => {
         try {
             // Include only previous context (up to last 10 messages to save tokens)
             const chatHistory = [...messages, userMessage].slice(-10);
-
+            
             // Get the base API URL and ensure we don't have duplicate /api
-            let apiUrl = import.meta.env.VITE_API_URL || 'https://final-year-project-f2p0.onrender.com/api';
+            let apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
             // If the URL already ends with /api, we append /chat, else /api/chat
             const endpoint = apiUrl.endsWith('/api') ? `${apiUrl}/chat` : `${apiUrl}/api/chat`;
 
             const response = await axios.post(
-                endpoint,
+                endpoint, 
                 { messages: chatHistory },
                 { withCredentials: true }
             );
@@ -50,7 +50,7 @@ const ChatWidget = () => {
         } catch (error) {
             console.error('Chat error:', error);
             setMessages((prev) => [
-                ...prev,
+                ...prev, 
                 { role: 'assistant', content: 'Sorry, I am having trouble connecting right now. Please try again later.' }
             ]);
         } finally {
@@ -87,7 +87,7 @@ const ChatWidget = () => {
                                     <p className="text-xs text-red-100">Powered by OpenAI</p>
                                 </div>
                             </div>
-                            <button
+                            <button 
                                 onClick={() => setIsOpen(false)}
                                 className="text-white hover:text-red-200 transition-colors bg-white/10 p-1 rounded-full"
                             >
@@ -98,8 +98,8 @@ const ChatWidget = () => {
                         {/* Messages Area */}
                         <div className="flex-1 overflow-y-auto p-4 bg-gray-50 flex flex-col gap-4">
                             {messages.map((msg, index) => (
-                                <motion.div
-                                    key={index}
+                                <motion.div 
+                                    key={index} 
                                     initial={{ opacity: 0, y: 10 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     className={`flex gap-3 max-w-[85%] ${msg.role === 'user' ? 'self-end flex-row-reverse' : 'self-start'}`}
@@ -107,16 +107,17 @@ const ChatWidget = () => {
                                     <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm ${msg.role === 'user' ? 'bg-blue-600 text-white' : 'bg-red-600 text-white'}`}>
                                         {msg.role === 'user' ? <User size={16} /> : <Bot size={16} />}
                                     </div>
-                                    <div className={`p-3 rounded-2xl text-sm shadow-sm ${msg.role === 'user'
-                                            ? 'bg-blue-600 text-white rounded-tr-sm'
+                                    <div className={`p-3 rounded-2xl text-sm shadow-sm ${
+                                        msg.role === 'user' 
+                                            ? 'bg-blue-600 text-white rounded-tr-sm' 
                                             : 'bg-white text-gray-800 border border-gray-100 rounded-tl-sm'
-                                        }`}>
+                                    }`}>
                                         {msg.content}
                                     </div>
                                 </motion.div>
                             ))}
                             {isLoading && (
-                                <motion.div
+                                <motion.div 
                                     initial={{ opacity: 0 }} animate={{ opacity: 1 }}
                                     className="flex gap-3 max-w-[85%] self-start"
                                 >
@@ -134,7 +135,7 @@ const ChatWidget = () => {
 
                         {/* Input Area */}
                         <div className="p-3 bg-white border-t border-gray-100">
-                            <form
+                            <form 
                                 onSubmit={handleSendMessage}
                                 className="flex items-center gap-2 bg-gray-50 p-1 pl-4 rounded-full border border-gray-200 focus-within:border-red-400 focus-within:ring-2 focus-within:ring-red-100 transition-all"
                             >

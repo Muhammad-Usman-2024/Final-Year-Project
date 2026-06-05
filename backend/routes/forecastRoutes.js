@@ -4,7 +4,7 @@ import { protect, authorize } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-// Only Admins and Hospital managers can see forecasting
-router.get('/', protect, authorize('Admin', 'Hospital'), getForecastingData);
+// Only SuperAdmins and Hospital managers can see forecasting
+router.get('/', protect, authorize('SuperAdmin', 'Hospital'), getForecastingData);
 
 export default router;

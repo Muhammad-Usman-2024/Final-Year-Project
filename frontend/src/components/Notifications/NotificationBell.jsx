@@ -18,8 +18,9 @@ const NotificationBell = () => {
         dispatch(fetchUnreadCount());
 
         // Establish SSE connection
+        const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
         const eventSource = new EventSource(
-            `${import.meta.env.VITE_API_URL}/notifications/stream?token=${user.accessToken}`,
+            `${apiBaseUrl}/notifications/stream?token=${encodeURIComponent(user.accessToken)}`,
             { withCredentials: true }
         );
 

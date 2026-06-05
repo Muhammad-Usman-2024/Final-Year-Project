@@ -19,6 +19,7 @@ export const profileService = {
 
 // --- DONATION MODULE APIs ---
 export const donationService = {
+  getStats: () => api.get('/donation/stats'),
   getSlots: (hospitalId, date) => api.get('/donation/available-slots', { params: { hospitalId, date } }),
   bookAppointment: (data) => api.post('/donation/schedule', data),
   getHistory: (donorId) => api.get(`/donation/history/${donorId}`),
@@ -29,7 +30,9 @@ export const donationService = {
 export const inventoryService = {
   getStock: () => api.get('/inventory/stock'),
   addStock: (data) => api.post('/inventory/add', data),
+  getRequests: () => api.get('/inventory/requests'),
   requestBlood: (data) => api.post('/inventory/request', data),
+  approveRequest: (id) => api.put(`/inventory/request/${id}/approve`),
   fulfillRequest: (id) => api.put(`/inventory/request/${id}/fulfill`),
   getExpiryAlerts: () => api.get('/inventory/expiry-alerts'),
 };

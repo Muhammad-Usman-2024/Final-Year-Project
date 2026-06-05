@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Clock, MapPin, Droplets, Info, ChevronRight, Loader2 } from 'lucide-react';
-import { donationService } from '../../api/apiService';
+import { Calendar, Clock, Loader2 } from 'lucide-react';
+import { donationService, profileService, searchService } from '../../api/apiService';
 import toast from 'react-hot-toast';
 
 const AppointmentForm = ({ user }) => {
   const [formData, setFormData] = useState({
-    hospitalId: 'services-hospital',
-    hospitalName: 'Services Hospital, Lahore',
+    hospitalId: '',
+    hospitalName: '',
+    bloodGroup: '',
     date: new Date().toISOString().split('T')[0],
     slot: '',
     type: 'Whole blood',
@@ -14,8 +15,58 @@ const AppointmentForm = ({ user }) => {
   });
 
   const [slots, setSlots] = useState([]);
+  const [profileUser, setProfileUser] = useState(user || null);
+  const [hospitals, setHospitals] = useState([]);
+  const [stats, setStats] = useState({
+    registeredDonors: 0,
+    thisMonth: 0,
+    scheduledToday: 0,
+    pendingApproval: 0
+  });
+  const [loadingData, setLoadingData] = useState(true);
   const [loadingSlots, setLoadingSlots] = useState(false);
   const [booking, setBooking] = useState(false);
+
+  const displayUser = profileUser || user || {};
+  const bloodGroups = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
+
+  useEffect(() => {
+    const fetchInitialData = async () => {
+      setLoadingData(true);
+      try {
+        const [profileRes, hospitalsRes, statsRes] = await Promise.all([
+          user?._id ? profileService.getProfile(user._id) : Promise.resolve(null),
+          searchService.getHospitals(),
+          donationService.getStats()
+        ]);
+
+        const freshUser = profileRes?.data?.data?.user || user || null;
+        const hospitalList = hospitalsRes?.data?.data || [];
+        setProfileUser(freshUser);
+        setHospitals(hospitalList);
+        setStats(statsRes?.data?.data || {
+          registeredDonors: 0,
+          thisMonth: 0,
+          scheduledToday: 0,
+          pendingApproval: 0
+        });
+
+        setFormData((prev) => ({
+          ...prev,
+          bloodGroup: freshUser?.bloodGroup || '',
+          hospitalId: hospitalList[0]?._id || '',
+          hospitalName: hospitalList[0]?.fullName || ''
+        }));
+      } catch (err) {
+        console.error(err);
+        toast.error('Failed to load donation data');
+      } finally {
+        setLoadingData(false);
+      }
+    };
+
+    fetchInitialData();
+  }, [user]);
 
   useEffect(() => {
     const fetchSlots = async () => {
@@ -29,16 +80,21 @@ const AppointmentForm = ({ user }) => {
         setLoadingSlots(false);
       }
     };
-    if (formData.date) fetchSlots();
+    if (formData.hospitalId && formData.date) fetchSlots();
+    else setSlots([]);
   }, [formData.date, formData.hospitalId]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!formData.hospitalId) return toast.error('Please select a hospital');
+    if (!formData.bloodGroup) return toast.error('Please select blood group');
     if (!formData.slot) return toast.error('Please select a time slot');
     setBooking(true);
     try {
       await donationService.bookAppointment(formData);
       toast.success('Appointment booked successfully!');
+      const statsRes = await donationService.getStats();
+      setStats(statsRes?.data?.data || stats);
     } catch (err) {
       toast.error(err.response?.data?.message || 'Booking failed');
     } finally {
@@ -46,15 +102,24 @@ const AppointmentForm = ({ user }) => {
     }
   };
 
+  if (loadingData) {
+    return (
+      <div className="fade-in max-w-4xl mx-auto bg-card-bg border border-border-color rounded-[20px] p-10 flex items-center justify-center gap-3 text-gray-400">
+        <Loader2 className="animate-spin text-accent-red" />
+        Loading donation data...
+      </div>
+    );
+  }
+
   return (
     <div className="fade-in max-w-4xl mx-auto space-y-6">
       {/* Top Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { label: 'Registered donors', value: '1,248' },
-          { label: 'This month', value: '143' },
-          { label: 'Scheduled today', value: '28' },
-          { label: 'Pending approval', value: '17' }
+          { label: 'Registered donors', value: stats.registeredDonors || 0 },
+          { label: 'This month', value: stats.thisMonth || 0 },
+          { label: 'Scheduled today', value: stats.scheduledToday || 0 },
+          { label: 'Pending approval', value: stats.pendingApproval || 0 }
         ].map((stat, i) => (
           <div key={i} className="bg-card-bg border border-white/5 p-4 rounded-xl">
             <p className="text-[10px] text-gray-500 uppercase font-bold tracking-widest">{stat.label}</p>
@@ -69,16 +134,21 @@ const AppointmentForm = ({ user }) => {
         <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
             <label className="text-sm text-gray-400">Donor name</label>
-            <input className="input-field bg-white/5" value={user?.fullName} disabled />
+            <input className="input-field bg-white/5" value={displayUser.fullName || 'No data'} disabled />
           </div>
           <div className="space-y-2">
             <label className="text-sm text-gray-400">CNIC</label>
-            <input className="input-field bg-white/5" value={user?.cnic} disabled />
+            <input className="input-field bg-white/5" value={displayUser.cnic || 'No data'} disabled />
           </div>
           <div className="space-y-2">
             <label className="text-sm text-gray-400">Blood group</label>
-            <select className="input-field bg-secondary-bg" value={user?.bloodGroup} disabled>
-              <option>{user?.bloodGroup || 'Select Group'}</option>
+            <select
+              className="input-field bg-secondary-bg"
+              value={formData.bloodGroup}
+              onChange={(e) => setFormData({...formData, bloodGroup: e.target.value})}
+            >
+              <option value="">No data</option>
+              {bloodGroups.map((group) => <option key={group} value={group}>{group}</option>)}
             </select>
           </div>
           <div className="space-y-2">
@@ -98,11 +168,22 @@ const AppointmentForm = ({ user }) => {
             <select 
               className="input-field bg-secondary-bg"
               value={formData.hospitalId}
-              onChange={(e) => setFormData({...formData, hospitalId: e.target.value, hospitalName: e.target.options[e.target.selectedIndex].text})}
+              onChange={(e) => {
+                const selectedHospital = hospitals.find((hospital) => hospital._id === e.target.value);
+                setFormData({
+                  ...formData,
+                  hospitalId: selectedHospital?._id || '',
+                  hospitalName: selectedHospital?.fullName || '',
+                  slot: ''
+                });
+              }}
             >
-              <option value="services-hospital">Services Hospital, Lahore</option>
-              <option value="indus-hospital">Indus Hospital, Lahore</option>
-              <option value="children-hospital">Children Hospital</option>
+              <option value="">{hospitals.length ? 'Select hospital' : 'No data'}</option>
+              {hospitals.map((hospital) => (
+                <option key={hospital._id} value={hospital._id}>
+                  {hospital.fullName}{hospital.personalInfo?.city || hospital.city ? `, ${hospital.personalInfo?.city || hospital.city}` : ''}
+                </option>
+              ))}
             </select>
           </div>
           <div className="space-y-2">
@@ -123,9 +204,13 @@ const AppointmentForm = ({ user }) => {
             
             {loadingSlots ? (
               <div className="flex justify-center p-8"><Loader2 className="animate-spin text-accent-red" /></div>
+            ) : !formData.hospitalId ? (
+              <div className="p-8 rounded-xl border border-dashed border-white/10 text-center text-gray-500 text-sm">
+                No data
+              </div>
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                {slots.map((s, i) => (
+                {slots.length ? slots.map((s, i) => (
                   <button
                     key={i}
                     type="button"
@@ -142,7 +227,11 @@ const AppointmentForm = ({ user }) => {
                     {s.time}
                     {s.isFull && <p className="text-[8px] mt-1 font-bold">Full</p>}
                   </button>
-                ))}
+                )) : (
+                  <div className="col-span-full p-8 rounded-xl border border-dashed border-white/10 text-center text-gray-500 text-sm">
+                    No data
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -159,7 +248,7 @@ const AppointmentForm = ({ user }) => {
 
           <button 
             type="submit" 
-            disabled={booking || !formData.slot}
+            disabled={booking || !formData.hospitalId || !formData.bloodGroup || !formData.slot}
             className="md:col-span-2 submit-btn flex items-center justify-center gap-2"
           >
             {booking ? <Loader2 className="animate-spin" size={18} /> : <Calendar size={18} />}
