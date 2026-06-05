@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { 
-  Heart, Activity, ShieldCheck, ArrowRight, HeartPulse, Hospital, Users, Lock, ChevronDown, CheckCircle2, Droplet, Stethoscope, Clock, Shield, Calendar, UserPlus, Languages
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import {
+  Heart, Activity, ShieldCheck, ArrowRight, HeartPulse, Hospital, Lock, ChevronDown, CheckCircle2, Droplet, Stethoscope, Clock, Shield, Calendar, UserPlus, Languages, Mail, Phone
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import logo from '../assets/logo.png';
-import i18n from '../i18n';
 import heroBg from '../assets/hero_bg.png';
+import contactUsBg from '../assets/contactus.jpg';
+import donationBg from '../assets/donationimage.png';
 
 const LandingPage = () => {
   const { t, i18n } = useTranslation();
@@ -21,7 +22,7 @@ const LandingPage = () => {
 
   return (
     <div className={`min-h-screen w-full bg-white text-slate-900 font-inter overflow-x-hidden selection:bg-red-500/30 ${currentLanguage.startsWith('ur') ? 'font-noto-urdu' : ''}`}>
-      
+
       {/* --- HEADER --- */}
       <header className="fixed top-0 w-full p-4 md:px-12 flex justify-between items-center z-50 bg-white/90 backdrop-blur-md border-b border-gray-100 shadow-sm">
         <div className="flex items-center">
@@ -30,8 +31,8 @@ const LandingPage = () => {
         <nav className="flex items-center gap-4 md:gap-6">
           <a href="#features" className="hidden md:block text-sm font-semibold text-gray-600 hover:text-red-600 transition-colors">{t('navbar.features')}</a>
           <a href="#how-it-works" className="hidden md:block text-sm font-semibold text-gray-600 hover:text-red-600 transition-colors">{t('navbar.howItWorks')}</a>
-          
-          <button 
+
+          <button
             onClick={toggleLanguage}
             className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-gray-200 hover:bg-gray-50 transition-all text-sm font-bold text-gray-700"
           >
@@ -49,16 +50,16 @@ const LandingPage = () => {
       <section className="pt-28 md:pt-40 pb-24 px-6 relative flex flex-col items-center justify-center min-h-[95vh] overflow-hidden">
         {/* Background Image with Overlay */}
         <div className="absolute inset-0 z-0">
-          <img 
-            src={heroBg} 
-            alt="Pakistani Blood Donation Background" 
+          <img
+            src={heroBg}
+            alt="Pakistani Blood Donation Background"
             className="w-full h-full object-cover opacity-60"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-white/30 via-white/20 to-gray-50/40"></div>
         </div>
 
         <div className="absolute top-20 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-red-100 rounded-full blur-[100px] pointer-events-none -z-10 opacity-70"></div>
-        
+
         <div className="relative z-10 flex flex-col items-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-red-50 border border-red-100 text-red-600 text-xs font-bold uppercase tracking-widest mb-8 shadow-sm">
             <span className="relative flex h-2 w-2">
@@ -67,16 +68,16 @@ const LandingPage = () => {
             </span>
             {t('hero.badge')}
           </div>
-          
+
           <h1 className="text-5xl md:text-8xl font-black text-center max-w-5xl tracking-tighter leading-[1.1] font-outfit mb-6 text-black">
             {t('hero.title1')} <br className="hidden md:block" />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-red-800">{t('hero.title2')}</span>
           </h1>
-          
+
           <p className="text-gray-600 text-lg md:text-2xl text-center max-w-3xl mb-12 font-medium leading-relaxed">
             {t('hero.subtitle')}
           </p>
-          
+
           <div className="flex flex-col sm:flex-row items-center gap-4 w-full justify-center">
             <Link to="/login" className="w-full sm:w-auto px-10 py-4 rounded-2xl bg-gradient-to-r from-red-600 to-red-800 text-white font-bold text-lg transition-all hover:shadow-[0_0_40px_rgba(220,38,38,0.3)] hover:-translate-y-1 flex items-center justify-center gap-2 group">
               {t('hero.cta1')} <ArrowRight size={20} className={`group-hover:translate-x-1 transition-transform ${currentLanguage.startsWith('ur') ? 'rotate-180' : ''}`} />
@@ -124,7 +125,7 @@ const LandingPage = () => {
         <div className="max-w-6xl mx-auto text-center">
           <h2 className="text-sm font-bold text-red-600 tracking-widest uppercase mb-3">{t('process.badge')}</h2>
           <h3 className="text-4xl md:text-5xl font-black font-outfit text-black mb-16">{t('process.title')}</h3>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             {[
               { step: '01', title: t('process.step1.title'), desc: t('process.step1.desc') },
@@ -152,34 +153,34 @@ const LandingPage = () => {
             <h2 className="text-3xl md:text-5xl font-black font-outfit text-black mb-4">{t('features.title')}</h2>
             <p className="text-gray-600 max-w-2xl mx-auto text-lg">{t('features.subtitle')}</p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <FeatureCard 
+            <FeatureCard
               icon={<HeartPulse size={32} />}
               title={t('features.match.title')}
               desc={t('features.match.desc')}
             />
-            <FeatureCard 
+            <FeatureCard
               icon={<Clock size={32} />}
               title={t('features.alerts.title')}
               desc={t('features.alerts.desc')}
             />
-            <FeatureCard 
+            <FeatureCard
               icon={<Droplet size={32} />}
               title={t('features.inventory.title')}
               desc={t('features.inventory.desc')}
             />
-            <FeatureCard 
+            <FeatureCard
               icon={<ShieldCheck size={32} />}
               title={t('features.security.title')}
               desc={t('features.security.desc')}
             />
-            <FeatureCard 
+            <FeatureCard
               icon={<Activity size={32} />}
               title={t('features.wellness.title')}
               desc={t('features.wellness.desc')}
             />
-            <FeatureCard 
+            <FeatureCard
               icon={<Calendar size={32} />}
               title={t('features.scheduling.title')}
               desc={t('features.scheduling.desc')}
@@ -189,24 +190,32 @@ const LandingPage = () => {
       </section>
 
       {/* --- 5. PLATFORM ROLES --- */}
-      <section className="py-24 px-6 bg-black text-white">
-        <div className="max-w-7xl mx-auto">
+      <section className="relative py-24 px-6 bg-black text-white overflow-hidden">
+        <img
+          src={donationBg}
+          alt="Blood donation dashboard background"
+          className="absolute inset-0 h-full w-full object-cover object-center opacity-75"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-black/15"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-black/20"></div>
+
+        <div className="relative z-10 max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
             <div className="max-w-2xl">
-              <h2 className="text-sm font-bold text-red-500 tracking-widest uppercase mb-3">{t('roles.badge')}</h2>
-              <h3 className="text-4xl md:text-5xl font-black font-outfit mb-4">{t('roles.title')}</h3>
-              <p className="text-gray-400 text-lg">{t('roles.subtitle')}</p>
+              <h2 className="text-sm font-bold text-red-400 tracking-widest uppercase mb-3">{t('roles.badge')}</h2>
+              <h3 className="text-4xl md:text-6xl font-black font-outfit mb-5">{t('roles.title')}</h3>
+              <p className="text-white/75 text-lg md:text-xl leading-relaxed">{t('roles.subtitle')}</p>
             </div>
-            <Link to="/login" className="px-6 py-3 rounded-xl bg-white text-black font-bold hover:bg-gray-200 transition-colors">
-              {t('roles.cta')}
+            <Link to="/login" className="inline-flex items-center gap-3 px-7 py-4 rounded-2xl bg-white text-black font-black hover:bg-red-50 hover:text-red-700 transition-colors shadow-[0_18px_45px_rgba(0,0,0,0.25)]">
+              {t('roles.cta')} <ArrowRight size={18} className={currentLanguage.startsWith('ur') ? 'rotate-180' : ''} />
             </Link>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <RoleCard icon={<Heart />} title={t('roles.donor.title')} bg="bg-red-600" text={t('roles.donor.text')} />
-            <RoleCard icon={<Activity />} title={t('roles.patient.title')} bg="bg-gray-900" text={t('roles.patient.text')} />
-            <RoleCard icon={<Hospital />} title={t('roles.hospital.title')} bg="bg-gray-900" text={t('roles.hospital.text')} />
-            <RoleCard icon={<Stethoscope />} title={t('roles.doctor.title')} bg="bg-gray-900" text={t('roles.doctor.text')} />
+            <RoleCard icon={<Heart />} title={t('roles.donor.title')} featured text={t('roles.donor.text')} />
+            <RoleCard icon={<Activity />} title={t('roles.patient.title')} text={t('roles.patient.text')} />
+            <RoleCard icon={<Hospital />} title={t('roles.hospital.title')} text={t('roles.hospital.text')} />
+            <RoleCard icon={<Stethoscope />} title={t('roles.doctor.title')} text={t('roles.doctor.text')} />
           </div>
         </div>
       </section>
@@ -241,16 +250,16 @@ const LandingPage = () => {
           </div>
           <div className="w-full md:w-1/2">
             <div className="aspect-[4/3] bg-gray-100 rounded-3xl border border-gray-200 overflow-hidden relative shadow-lg flex items-center justify-center p-8">
-               <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] opacity-50"></div>
-               <div className="relative z-10 bg-white p-6 rounded-2xl shadow-xl w-full max-w-sm border border-red-100">
-                  <div className="flex justify-between items-center mb-4">
-                    <span className="text-xs font-bold bg-red-100 text-red-600 px-2 py-1 rounded uppercase">{t('thalassemia.alert')}</span>
-                    <span className="text-xs text-gray-500">{t('thalassemia.now')}</span>
-                  </div>
-                  <h4 className="font-bold text-black mb-1">{t('thalassemia.required')}</h4>
-                  <p className="text-sm text-gray-600 mb-4">{t('thalassemia.at')}</p>
-                  <button className="w-full bg-black text-white text-sm font-bold py-2 rounded-lg">{t('thalassemia.accept')}</button>
-               </div>
+              <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] opacity-50"></div>
+              <div className="relative z-10 bg-white p-6 rounded-2xl shadow-xl w-full max-w-sm border border-red-100">
+                <div className="flex justify-between items-center mb-4">
+                  <span className="text-xs font-bold bg-red-100 text-red-600 px-2 py-1 rounded uppercase">{t('thalassemia.alert')}</span>
+                  <span className="text-xs text-gray-500">{t('thalassemia.now')}</span>
+                </div>
+                <h4 className="font-bold text-black mb-1">{t('thalassemia.required')}</h4>
+                <p className="text-sm text-gray-600 mb-4">{t('thalassemia.at')}</p>
+                <button className="w-full bg-black text-white text-sm font-bold py-2 rounded-lg">{t('thalassemia.accept')}</button>
+              </div>
             </div>
           </div>
         </div>
@@ -284,6 +293,67 @@ const LandingPage = () => {
         </div>
       </section>
 
+      {/* --- 10. FINAL CTA --- */}
+      <section className="relative overflow-hidden bg-red-700 px-6 py-24 text-white">
+        <img
+          src={heroBg}
+          alt="Blood donation community"
+          className="absolute inset-0 h-full w-full object-cover opacity-20 mix-blend-multiply"
+        />
+        <div className="absolute inset-0 bg-[linear-gradient(120deg,rgba(127,29,29,0.96),rgba(185,28,28,0.88)_48%,rgba(15,23,42,0.92))]"></div>
+        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/20 to-transparent"></div>
+
+        <div className="relative z-10 mx-auto grid max-w-6xl grid-cols-1 items-center gap-12 lg:grid-cols-[1fr_0.82fr]">
+          <div>
+            <span className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-bold uppercase tracking-widest text-red-50 backdrop-blur-sm">
+              <HeartPulse size={16} />
+              Live Blood Network
+            </span>
+            <h2 className="max-w-3xl font-outfit text-4xl font-black leading-tight md:text-6xl">
+              Join BloodSync and help every urgent request reach the right donor faster.
+            </h2>
+            <p className="mt-6 max-w-2xl text-lg leading-relaxed text-red-50/85 md:text-xl">
+              A smarter platform for patients, donors, doctors, and hospitals to coordinate lifesaving blood support in real time.
+            </p>
+
+            <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+              <Link
+                to="/login"
+                className="inline-flex items-center justify-center gap-3 rounded-2xl bg-white px-8 py-4 text-base font-black text-red-700 shadow-[0_20px_50px_rgba(0,0,0,0.22)] transition-all hover:-translate-y-0.5 hover:bg-red-50"
+              >
+                Login / Register
+                <ArrowRight className={currentLanguage.startsWith('ur') ? 'rotate-180' : ''} size={20} />
+              </Link>
+              <a
+                href="#contact"
+                className="inline-flex items-center justify-center gap-3 rounded-2xl border border-white/25 bg-white/10 px-8 py-4 text-base font-bold text-white backdrop-blur-sm transition-all hover:bg-white/15"
+              >
+                Contact Support
+              </a>
+            </div>
+          </div>
+
+          <div className="grid gap-4">
+            {[
+              { icon: <Clock size={24} />, title: 'Fast Matching', text: 'Real-time alerts help reduce delays during urgent blood needs.' },
+              { icon: <ShieldCheck size={24} />, title: 'Verified Access', text: 'Role-based dashboards keep patients, donors, and hospitals organized.' },
+              { icon: <Droplet size={24} />, title: 'Blood Ready', text: 'Track requests, appointments, and inventory from one connected platform.' },
+            ].map((item) => (
+              <div key={item.title} className="flex gap-4 rounded-2xl border border-white/15 bg-black/20 p-5 text-left backdrop-blur-md">
+                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white text-red-600">
+                  {item.icon}
+                </span>
+                <span>
+                  <span className="block text-lg font-black text-white">{item.title}</span>
+                  <span className="mt-1 block text-sm leading-relaxed text-red-50/75">{item.text}</span>
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      
       {/* --- 9. FAQ SECTION --- */}
       <section className="py-24 px-6 bg-white">
         <div className="max-w-3xl mx-auto">
@@ -297,17 +367,65 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* --- 10. FINAL CTA --- */}
-      <section className="py-24 px-6 bg-black relative overflow-hidden">
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-red-600/20 rounded-full blur-[100px] pointer-events-none"></div>
-        <div className="max-w-4xl mx-auto text-center relative z-10">
-          <h2 className="text-5xl md:text-6xl font-black font-outfit text-white mb-6">{t('hero.cta1')}?</h2>
-          <p className="text-gray-400 text-xl mb-10 max-w-2xl mx-auto">
-            {t('hero.subtitle')}
-          </p>
-          <Link to="/login" className="inline-flex items-center gap-3 px-10 py-5 rounded-2xl bg-red-600 text-white font-bold text-xl hover:bg-red-500 transition-colors shadow-[0_0_40px_rgba(220,38,38,0.4)]">
-            {t('navbar.login')} <ArrowRight className={currentLanguage.startsWith('ur') ? 'rotate-180' : ''} />
-          </Link>
+      {/* --- 10.5. CONTACT SECTION --- */}
+      <section id="contact" className="relative py-24 px-6 text-white overflow-hidden">
+        <img
+          src={contactUsBg}
+          alt="BloodSync contact support"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/70 to-red-950/60"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(220,38,38,0.35),transparent_32%)]"></div>
+
+        <div className="relative z-10 max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-[1.05fr_0.95fr] gap-10 items-center">
+          <div className="text-left">
+            <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/15 text-red-100 text-xs font-bold uppercase tracking-widest mb-6 backdrop-blur-sm">
+              BloodSync Support
+            </span>
+            <h2 className="text-4xl md:text-6xl font-black font-outfit leading-tight mb-5">
+              Contact Us
+            </h2>
+            <p className="text-white/80 text-lg md:text-xl leading-relaxed max-w-2xl mb-8">
+              Need help with blood requests, donor coordination, or hospital support? Our team is ready to respond quickly and guide you with care.
+            </p>
+            <a
+              href="https://wa.me/+923074272579"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-3 px-8 py-4 rounded-2xl bg-green-500 text-white font-bold hover:bg-green-400 transition-all shadow-[0_18px_45px_rgba(34,197,94,0.28)]"
+            >
+              <Phone className="h-5 w-5" />
+              WhatsApp Chat
+            </a>
+          </div>
+
+          <div className="grid gap-4">
+            <a
+              href="mailto:support@bloodsync.com"
+              className="group flex items-center gap-5 rounded-2xl border border-white/15 bg-white/10 p-6 text-left backdrop-blur-md transition-all hover:bg-white/15 hover:border-red-300/50"
+            >
+              <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white text-red-600 shadow-lg group-hover:scale-105 transition-transform">
+                <Mail className="h-6 w-6" />
+              </span>
+              <span>
+                <span className="block text-sm font-bold uppercase tracking-widest text-red-100 mb-1">Email</span>
+                <span className="block text-lg md:text-xl font-black text-white break-all">support@bloodsync.com</span>
+              </span>
+            </a>
+
+            <a
+              href="tel:+923074272579"
+              className="group flex items-center gap-5 rounded-2xl border border-white/15 bg-white/10 p-6 text-left backdrop-blur-md transition-all hover:bg-white/15 hover:border-red-300/50"
+            >
+              <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-red-600 text-white shadow-lg group-hover:scale-105 transition-transform">
+                <Phone className="h-6 w-6" />
+              </span>
+              <span>
+                <span className="block text-sm font-bold uppercase tracking-widest text-red-100 mb-1">Phone</span>
+                <span className="block text-lg md:text-xl font-black text-white">+92 307 4272579</span>
+              </span>
+            </a>
+          </div>
         </div>
       </section>
 
@@ -322,13 +440,13 @@ const LandingPage = () => {
         <div className="flex justify-center gap-6 mb-8 text-sm font-bold text-gray-400">
           <a href="#" className="hover:text-black transition-colors">{t('footer.privacy')}</a>
           <a href="#" className="hover:text-black transition-colors">{t('footer.terms')}</a>
-          <a href="#" className="hover:text-black transition-colors">{t('footer.contact')}</a>
+          <a href="https://wa.me/1234567890" target="_blank" rel="noopener noreferrer" className="hover:text-black transition-colors">{t('footer.contact')}</a>
         </div>
         <p className="text-sm text-gray-400">
           {t('footer.rights')}
         </p>
       </footer>
-      
+
     </div>
   );
 };
@@ -344,11 +462,11 @@ const FeatureCard = ({ icon, title, desc }) => (
   </div>
 );
 
-const RoleCard = ({ icon, title, bg, text }) => (
-  <div className={`p-8 rounded-3xl ${bg} ${bg === 'bg-red-600' ? 'text-white' : 'text-gray-100 border border-white/10 hover:bg-gray-800'} transition-all`}>
-    <div className="mb-6 opacity-80">{icon}</div>
+const RoleCard = ({ icon, title, text, featured = false }) => (
+  <div className={`p-8 rounded-3xl border transition-all duration-300 hover:-translate-y-1 ${featured ? 'bg-red-600/95 text-white border-red-400/30 shadow-[0_24px_60px_rgba(220,38,38,0.35)]' : 'bg-slate-950/70 text-gray-100 border-white/10 backdrop-blur-md hover:bg-slate-900/85 hover:border-red-300/25'}`}>
+    <div className={`${featured ? 'text-white' : 'text-red-200'} mb-8 opacity-90`}>{icon}</div>
     <h4 className="text-2xl font-bold mb-2">{title}</h4>
-    <p className={`text-sm ${bg === 'bg-red-600' ? 'text-red-100' : 'text-gray-400'}`}>{text}</p>
+    <p className={`text-sm leading-relaxed ${featured ? 'text-red-50' : 'text-gray-300'}`}>{text}</p>
   </div>
 );
 
@@ -363,7 +481,7 @@ const FAQItem = ({ q, a }) => {
   const [open, setOpen] = useState(false);
   return (
     <div className="border border-gray-200 rounded-2xl overflow-hidden bg-gray-50">
-      <button 
+      <button
         className="w-full px-6 py-5 text-left font-bold text-black flex justify-between items-center hover:bg-gray-100 transition-colors"
         onClick={() => setOpen(!open)}
       >
